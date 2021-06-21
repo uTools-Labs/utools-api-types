@@ -606,4 +606,4 @@ interface UToolsApi {
   ubrowser: UBrowser;
 }
 
-declare const utools: UToolsApi;
+declare var utools: UToolsApi;

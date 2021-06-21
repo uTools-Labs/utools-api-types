@@ -1,4 +1,4 @@
-## 如何使用 uTools API 提示文件
+## uTools API 代码提示
 
 第一步
 ```
@@ -15,4 +15,36 @@ npm install utools-api-types --save-dev
     ]
   }
 }
+```
+
+## API 代码示例
+
+```
+// 默认浏览器打开网页
+window.utools.shellOpenExternal('https://u.tools')
+
+// 在资源管理器中显示文件
+window.utools.shellShowItemInFolder('d:\\test')
+
+// ubrowser 网页自动化
+window.utools.ubrowser.goto('https://cn.bing.com')
+  .value('#sb_form_q', 'uTools')
+  .click('#sb_form_go')
+  .run({ width: 1000, height: 600 })
+
+// 获取当前浏览器 URL
+window.utools.getCurrentBrowserUrl()
+
+// 值键对方式存储数据
+window.utools.dbStorage.setItem('key', 'value')
+
+// 执行截图
+window.utools.screenCapture((imagebase64) => {
+  // 截图完的回调
+})
+
+// 执行取色
+window.utools.screenColorPick(({ hex, rgb }) => {
+  // 取色完的回调
+})
 ```
