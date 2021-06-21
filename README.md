@@ -1,13 +1,13 @@
 ## uTools API 代码提示
 
-第一步
-```
+第一步 
+```bash
 npm install utools-api-types --save-dev
 ```
 
 第二步 配置 tsconfig.json
 
-```
+```json
 {
   "compilerOptions": {
     "types": [
@@ -19,7 +19,7 @@ npm install utools-api-types --save-dev
 
 ## API 代码示例
 
-```
+```javascript
 // 默认浏览器打开网页
 window.utools.shellOpenExternal('https://u.tools')
 
