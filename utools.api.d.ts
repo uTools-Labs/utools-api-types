@@ -208,6 +208,21 @@ interface Display {
   workAreaSize: { width: number, height: number };
 }
 
+interface DbDoc {
+  _id: string,
+  _rev?: string,
+  [key: string]: any
+}
+
+interface DbReturn {
+  id: string,
+  rev?: string,
+  ok?: boolean,
+  error?: boolean,
+  name?: string,
+  message?: string
+}
+
 interface UToolsApi {
   /**
    * 插件装配初始化完成触发
@@ -275,7 +290,7 @@ interface UToolsApi {
    * @param options 参考 https://www.electronjs.org/docs/api/browser-window#new-browserwindowoptions
    * @param callback url 加载完成时的回调
    */
-  createBrowserWindow(url: string, options: { width?: number, height?: number }, callback?: () => void): { id: number; };
+  createBrowserWindow(url: string, options: { width?: number, height?: number }, callback?: () => void): { id: number, [key: string]: any, webContents: { id: number, [key: string]: any } };
   /**
    * 隐藏插件到后台
    */
@@ -298,7 +313,7 @@ interface UToolsApi {
    */
   openPayment(options: {
     /**
-     * 商品ID，在 uTools “开发者” 插件中创建
+     * 商品ID，在 “uTools 开发者工具” 插件中创建
      */
     goodsId: string,
     /**
@@ -550,30 +565,30 @@ interface UToolsApi {
     /**
      * 创建/更新文档
      */
-    put(doc: { _id: string, _rev?: string }): { id: string, rev?: string, ok?: boolean, error?: boolean, name?: string, message?: string };
+    put(doc: DbDoc): DbReturn;
     /**
      * 获取文档
      */
-    get(id: string): { _id: string, _rev: string } | null;
+    get(id: string): DbDoc | null;
     /**
      * 删除文档
      */
-    remove(doc: string | {_id: string, _rev: string}): { id?: string, rev?: string, ok?: boolean, error?: boolean, name?: string, message?: string };
+    remove(doc: string | DbDoc): DbReturn;
     /**
      * 批量操作文档(新增、修改、删除)
      */
-    bulkDocs(docs: { _id: string, _rev: string }[]): { id: string, rev?: string, ok?: boolean, error?: boolean, name?: string, message?: string }[];
+    bulkDocs(docs: DbDoc[]): DbReturn[];
     /**
      * 获取所有文档 可根据文档id前缀查找
      */
-    allDocs(key?: string): { _id: string, _rev: string }[];
+    allDocs(key?: string): DbDoc[];
     /**
-     * 存储附件到文档
+     * 存储附件到新文档
      * @param docId 文档ID
      * @param attachment 附件 buffer
      * @param type 附件类型，示例：image/png, text/plain
      */
-    putAttachment(docId: string, attachment: Uint8Array, type: string):{ id: string, rev?: string, ok?: boolean, error?: boolean, name?: string, message?: string };
+    postAttachment(docId: string, attachment: Uint8Array, type: string): DbReturn;
     /**
      * 获取附件
      * @param docId 文档ID
