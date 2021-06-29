@@ -449,9 +449,9 @@ interface UToolsApi {
    */
   screenCapture(callback: (imgBase64: string) => void): void;
   /**
-   * 获取本地ID
+   * 获取本地 ID
    */
-  getLocalId(): string;
+  getNativeId(): string;
   /**
    * 获取软件版本
    */
@@ -482,16 +482,16 @@ interface UToolsApi {
    */
   getCopyedFiles(): { isFile: boolean, isDirectory: boolean, name: string, path: string }[];
   /**
-   * 获取当前文件管理器路径(linux 不支持)
-   */
-  getCurrentFolderPath(): string;
+   * 读取当前文件管理器路径(linux 不支持)
+  */
+  readCurrentFolderPath(): Promise<string>;
   /**
-   * 获取当前浏览器URL(linux 不支持)
+   * 读取当前浏览器窗口的URL(linux 不支持)
    * MacOs 支持浏览器 Safari、Chrome、Opera、Vivaldi、Brave
    * Windows 支持浏览器 Chrome、Firefox、Edge、IE、Opera、Brave
    * Linux 不支持
    */
-  getCurrentBrowserUrl(): string;
+  readCurrentBrowserUrl(): Promise<string>;
   /**
    * 默认方式打开给定的文件
    */
