@@ -231,7 +231,7 @@ interface UToolsApi {
   /**
    * 插件进入时触发
    */
-  onPluginEnter(callback: (action: {code: string, type: string, payload: any, optional: { type: string, payload: any }[] }) => void): void;
+  onPluginEnter(callback: (action: {code: string, type: string, payload: any }) => void): void;
   /**
    * 插件隐藏时触发
    */
