@@ -406,23 +406,6 @@ interface UToolsApi {
     securityScopedBookmarks?: boolean
   }): (string) | (undefined);
   /**
-   * 弹出消息框
-   */
-  showMessageBox(options: {
-    type?: string,
-    buttons?: string[],
-    defaultId?: number,
-    title?: string,
-    message: string,
-    detail?: string,
-    checkboxLabel?: string,
-    checkboxChecked?: boolean,
-    icon?: string,
-    cancelId?: number,
-    noLink?: boolean,
-    normalizeAccessKeys?: boolean
-  }): number;
-  /**
    * 插件页面中查找
    */
   findInPage(text: string, options?: {
@@ -548,6 +531,10 @@ interface UToolsApi {
    * 获取矩形所在的显示器
    */
   getDisplayMatching(rect: { x: number, y: number, width: number, height: number }): Display;
+  /**
+   * 是否开发中
+   */
+  isDev(): boolean;
   /**
    * 是否 MacOs 操作系统
    */
