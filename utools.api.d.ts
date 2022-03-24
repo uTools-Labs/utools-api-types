@@ -5,12 +5,11 @@ interface UBrowser {
   useragent(userAgent: string): this;
   /**
    * 前往
+   * @param url 链接地址,支持 http 或 file 协议
+   * @param headers 请求头参数
+   * @param timeout 加载超时,默认 60000 ms(60秒)
    */
-  goto(url: string, headers?: { Referer: string, userAgent: string }): this;
-  /**
-   * 显示Markdown
-   */
-  goto(mdText: string, title?: string): this;
+  goto(url: string, headers?: { Referer: string, userAgent: string }, timeout?: number): this;
   /**
    * 页面大小
    */
@@ -92,13 +91,13 @@ interface UBrowser {
   /**
    * 等待元素出现
    * @param selector DOM元素
-   * @param timeout 超时 默认10000 ms(10秒)
+   * @param timeout 超时 默认60000 ms(60秒)
    */
   wait(selector: string, timeout?: number): this;
   /**
    * 等待 JS函数 执行返回 true
    * @param func 执行的JS函数
-   * @param timeout 超时 默认10000 ms(10秒)
+   * @param timeout 超时 默认60000 ms(60秒)
    * @param params 传到 func 中的参数
    */
   wait(func: (...params: any[]) => boolean, timeout?: number, ...params: any[]): this;
@@ -166,6 +165,7 @@ interface UBrowser {
   run(ubrowserId: number): Promise<any[]>;
   /**
    * 启动一个 ubrowser 运行
+   * 当运行结束后，窗口如果为隐藏状态将自动销毁窗口
    * @param options
    */
   run(options: {
@@ -224,10 +224,6 @@ interface DbReturn {
 }
 
 interface UToolsApi {
-  /**
-   * 插件装配初始化完成触发
-   */
-  onPluginReady(callback: () => void): void;
   /**
    * 插件进入时触发
    */
@@ -586,6 +582,48 @@ interface UToolsApi {
      * @param docId 文档ID
      */
     getAttachmentType(docId: string): string | null;
+    /**
+     * 异步
+     */
+    promises: {
+      /**
+       * 创建/更新文档
+       */
+      put(doc: DbDoc): Promise<DbReturn>;
+      /**
+        * 获取文档
+        */
+      get(id: string): Promise<DbDoc | null>;
+      /**
+        * 删除文档
+        */
+      remove(doc: string | DbDoc): Promise<DbReturn>;
+      /**
+        * 批量操作文档(新增、修改、删除)
+        */
+      bulkDocs(docs: DbDoc[]): Promise<DbReturn[]>;
+      /**
+        * 获取所有文档 可根据文档id前缀查找
+        */
+      allDocs(key?: string): Promise<DbDoc[]>;
+      /**
+        * 存储附件到新文档
+        * @param docId 文档ID
+        * @param attachment 附件 buffer
+        * @param type 附件类型，示例：image/png, text/plain
+        */
+      postAttachment(docId: string, attachment: Uint8Array, type: string): Promise<DbReturn>;
+      /**
+        * 获取附件
+        * @param docId 文档ID
+        */
+      getAttachment(docId: string): Promise<Uint8Array | null>;
+      /**
+        * 获取附件类型
+        * @param docId 文档ID
+        */
+      getAttachmentType(docId: string): Promise<string | null>;
+    }
   };
 
   dbStorage: {
