@@ -528,6 +528,10 @@ interface UToolsApi {
    */
   getDisplayMatching(rect: { x: number, y: number, width: number, height: number }): Display;
   /**
+   * 录屏源
+   */
+  desktopCaptureSources(options: { types: string[], thumbnailSize?: { width: number, height: number }, fetchWindowIcons?: boolean }):Promise<{appIcon: {}, display_id: string, id: string, name: string, thumbnail: {} }>;
+  /**
    * 是否开发中
    */
   isDev(): boolean;
@@ -583,6 +587,10 @@ interface UToolsApi {
      */
     getAttachmentType(docId: string): string | null;
     /**
+     * 云端复制数据状态 (null: 未开启数据同步、0: 已完成复制、1：复制中)
+     */
+    replicateStateFromCloud(): null | 0 | 1;
+    /**
      * 异步
      */
     promises: {
@@ -623,6 +631,10 @@ interface UToolsApi {
         * @param docId 文档ID
         */
       getAttachmentType(docId: string): Promise<string | null>;
+      /**
+       * 云端复制数据状态 (null: 未开启数据同步、0: 已完成复制、1：复制中)
+       */
+      replicateStateFromCloud(): Promise<null | 0 | 1>;
     }
   };
 
