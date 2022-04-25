@@ -1,6 +1,6 @@
 {
   "name": "utools-api-types",
-  "version": "2.6.3",
+  "version": "2.6.4",
   "description": "TypeScript definitions for uTools API",
   "repository": {
     "type": "git",
