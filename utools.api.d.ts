@@ -225,19 +225,19 @@ interface DbReturn {
 
 interface UToolsApi {
   /**
-   * 插件进入时触发
+   * 插件应用进入时触发
    */
   onPluginEnter(callback: (action: {code: string, type: string, payload: any }) => void): void;
   /**
-   * 插件隐藏时触发
+   * 插件应用隐藏后台或完全退出时触发
    */
-  onPluginOut(callback: () => void): void;
+  onPluginOut(callback: (processExit: boolean) => void): void;
   /**
-   * 插件分离时触发
+   * 插件应用分离时触发
    */
   onPluginDetach(callback: () => void): void;
   /**
-   * 插件从云端拉取到数据时触发
+   * 插件应用从云端拉取到数据时触发
    */
   onDbPull(callback: (docs: { _id: string, _rev: string }[]) => void): void;
   /**
@@ -250,7 +250,7 @@ interface UToolsApi {
    */
   showMainWindow(): boolean;
   /**
-   * 设置插件自身高度
+   * 设置插件应用自身高度
    */
   setExpendHeight(height: number): boolean;
   /**
@@ -277,7 +277,7 @@ interface UToolsApi {
    */
   subInputSelect(): boolean;
   /**
-   * 子输入框失去焦点，插件获得焦点
+   * 子输入框失去焦点，插件应用获得焦点
    */
   subInputBlur(): boolean;
   /**
@@ -288,7 +288,7 @@ interface UToolsApi {
    */
   createBrowserWindow(url: string, options: { width?: number, height?: number }, callback?: () => void): { id: number, [key: string]: any, webContents: { id: number, [key: string]: any } };
   /**
-   * 隐藏插件到后台
+   * 隐藏插件应用到后台
    */
   outPlugin(): boolean;
   /**
@@ -309,7 +309,7 @@ interface UToolsApi {
    */
   openPayment(options: {
     /**
-     * 商品ID，在 “uTools 开发者工具” 插件中创建
+     * 商品ID，在 “uTools 开发者工具” 插件应用中创建
      */
     goodsId: string,
     /**
@@ -326,7 +326,7 @@ interface UToolsApi {
    */
   fetchUserPayments(): Promise<{ order_id: string, total_fee: number, body: string, attach: string, goods_id: string, out_order_id: string, paid_at: string }[]>;
   /**
-   * 设置插件动态功能
+   * 设置插件应用动态功能
    */
   setFeature(feature: {
     code: string,
@@ -339,13 +339,13 @@ interface UToolsApi {
     }[]
   }): boolean;
   /**
-   * 移除插件动态功能
+   * 移除插件应用动态功能
    */
   removeFeature(code: string): boolean;
   /**
-   * 获取插件所有动态功能
+   * 获取插件应用动态功能，参数为空获取所有动态功能
    */
-  getFeatures(): {
+  getFeatures(codes?: string[]): {
     code: string,
     explain: string,
     platform: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
@@ -356,7 +356,7 @@ interface UToolsApi {
     }[]
   }[];
   /**
-   * 插件间跳转
+   * 插件应用间跳转
    */
   redirect(label: string, payload: string | { type: 'text' | 'img' | 'files', data: any }): void;
   /**
@@ -402,7 +402,7 @@ interface UToolsApi {
     securityScopedBookmarks?: boolean
   }): (string) | (undefined);
   /**
-   * 插件页面中查找
+   * 插件应用页面中查找
    */
   findInPage(text: string, options?: {
     forward?: boolean,
@@ -412,7 +412,7 @@ interface UToolsApi {
     medialCapitalAsWordStart?: boolean
   }): void;
   /**
-   * 停止插件页面中查找
+   * 停止插件应用页面中查找
    */
   stopFindInPage (action: 'clearSelection' | 'keepSelection' | 'activateSelection'): void;
   /**
@@ -487,6 +487,10 @@ interface UToolsApi {
    * 播放哔哔声
    */
   shellBeep(): void;
+  /*
+  * 隐藏主窗口并键入字符串
+  */
+  hideMainWindowTypeString(str: string): void;
   /**
    * 模拟键盘按键
    */
@@ -538,7 +542,7 @@ interface UToolsApi {
   /**
    * 是否 MacOs 操作系统
    */
-  isMacOs(): boolean;
+  isMacOS(): boolean;
   /**
    * 是否 Windows 操作系统
    */
