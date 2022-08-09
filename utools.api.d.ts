@@ -333,10 +333,10 @@ interface UToolsApi {
     explain: string,
     platform: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
     icon?: string,
-    cmds: string | {
+    cmds: (string | {
       type: 'img' | 'files' | 'regex' | 'over' | 'window',
       label: string
-    }[]
+    })[]
   }): boolean;
   /**
    * 移除插件应用动态功能
