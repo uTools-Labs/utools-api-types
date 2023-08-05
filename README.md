@@ -32,9 +32,6 @@ window.utools.ubrowser.goto('https://cn.bing.com')
   .click('#sb_form_go')
   .run({ width: 1000, height: 600 })
 
-// 获取当前浏览器 URL
-window.utools.getCurrentBrowserUrl()
-
 // 值键对方式存储数据
 window.utools.dbStorage.setItem('key', 'value')
 

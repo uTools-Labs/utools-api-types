@@ -29,7 +29,7 @@ interface UBrowser {
   /**
    * 键盘按键
    */
-  press(key: string, ...modifier: ('control' | 'ctrl' | 'shift' | 'meta' | 'alt' | 'command' | 'cmd')[]): this;
+  press(key: string, ...modifier: ('ctrl' | 'shift' | 'alt' | 'meta')[]): this;
   /**
    * 粘贴
    * @param text 如果是图片的base64编码字符串，粘贴图片，为空只执行粘贴动作
@@ -159,10 +159,9 @@ interface UBrowser {
    */
   scroll(x: number, y: number): this;
   /**
-   * 运行在闲置的 ubrowser 上
-   * @param ubrowserId utools.getIdleUBrowsers() 中获得
+   * 下载文件
    */
-  run(ubrowserId: number): Promise<any[]>;
+  download(url: string, savePath?: string): this;
   /**
    * 启动一个 ubrowser 运行
    * 当运行结束后，窗口如果为隐藏状态将自动销毁窗口
@@ -189,6 +188,11 @@ interface UBrowser {
     enableLargerThanScreen?: boolean,
     opacity?: number
   }): Promise<any[]>;
+  /**
+   * 运行在闲置的 ubrowser 上
+   * @param ubrowserId 1. run(options) 运行结束后, 当 ubrowser 实例窗口仍然显示时返回 2. utools.getIdleUBrowsers() 中获得
+   */
+  run(ubrowserId: number): Promise<any[]>;
 }
 
 interface Display {
@@ -227,7 +231,11 @@ interface UToolsApi {
   /**
    * 插件应用进入时触发
    */
-  onPluginEnter(callback: (action: {code: string, type: string, payload: any }) => void): void;
+  onPluginEnter(callback: (action: {code: string, type: string, payload: any, option: any }) => void): void;
+  /**
+  * 向搜索面板推送消息
+  */
+  onMainPush(callback: (action: {code: string, type: string, payload: any }) => { icon?: string, text: string, title?: string }[], selectCallback: (action: {code: string, type: string, payload: any,  option: { icon?: string, text: string, title?: string }}) => void): void;
   /**
    * 插件应用隐藏后台或完全退出时触发
    */
@@ -304,12 +312,34 @@ interface UToolsApi {
    */
   fetchUserServerTemporaryToken(): Promise<{ token: string, expiredAt: number }>;
   /**
-   * 打开支付
+   * 是否插件应用的付费用户
+   */
+  isPurchasedUser(): boolean;
+  /**
+   * 打开付费 (软件付费)
+   * @param callback 购买成功触发
+   */
+  openPurchase(options: {
+    /**
+     * 商品 ID，在「开发者工具」插件应用中创建
+     */
+    goodsId: string,
+    /**
+     * 第三方服务生成的订单号(可选)
+     */
+    outOrderId?: string,
+    /**
+     * 第三方服务附加数据，在查询API和支付通知中原样返回，可作为自定义参数使用(可选)
+     */
+    attach?: string
+  }, callback?: () => void): void;
+  /**
+   * 打开支付 (付费付费)
    * @param callback 支付成功触发
    */
   openPayment(options: {
     /**
-     * 商品ID，在 “uTools 开发者工具” 插件应用中创建
+     * 商品 ID，在「开发者工具」插件应用中创建
      */
     goodsId: string,
     /**
@@ -358,7 +388,7 @@ interface UToolsApi {
   /**
    * 插件应用间跳转
    */
-  redirect(label: string, payload: string | { type: 'text' | 'img' | 'files', data: any }): void;
+  redirect(label: string | string[], payload: string | { type: 'text' | 'img' | 'files', data: any }): void;
   /**
    * 获取闲置的 ubrowser
    */
@@ -436,6 +466,10 @@ interface UToolsApi {
    */
   getAppVersion(): string;
   /**
+   * 获取软件名称
+   */
+  getAppName(): string;
+  /**
    * 获取路径
    */
   getPath(name: 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'logs' | 'pepperFlashSystemPlugin'): string;
@@ -488,9 +522,21 @@ interface UToolsApi {
    */
   shellBeep(): void;
   /*
-  * 隐藏主窗口并键入字符串
+  * 键入字符串
   */
   hideMainWindowTypeString(str: string): void;
+  /*
+  * 粘贴文件
+  */
+  hideMainWindowPasteFile(file: string | string[]): void;
+  /*
+  * 粘贴图像
+  */
+  hideMainWindowPasteImage(img: string): void;
+  /*
+  * 粘贴文本
+  */
+  hideMainWindowPasteText(text: string): void;
   /**
    * 模拟键盘按键
    */
