@@ -267,7 +267,7 @@ interface UToolsApi {
    * @param placeholder 占位符， 默认为空
    * @param isFocus 是否获得焦点，默认为 true
    */
-  setSubInput(onChange: (text: string) => void, placeholder?: string, isFocus?: boolean): boolean;
+  setSubInput(onChange: ({text: string}) => void, placeholder?: string, isFocus?: boolean): boolean;
   /**
    * 移除子输入框
    */
