@@ -267,7 +267,7 @@ interface UToolsApi {
    * @param placeholder 占位符， 默认为空
    * @param isFocus 是否获得焦点，默认为 true
    */
-  setSubInput(onChange: (text: string) => void, placeholder?: string, isFocus?: boolean): boolean;
+  setSubInput(onChange: ({text: string}) => void, placeholder?: string, isFocus?: boolean): boolean;
   /**
    * 移除子输入框
    */
@@ -334,7 +334,7 @@ interface UToolsApi {
     attach?: string
   }, callback?: () => void): void;
   /**
-   * 打开支付 (付费付费)
+   * 打开支付 (付费)
    * @param callback 支付成功触发
    */
   openPayment(options: {
@@ -478,6 +478,10 @@ interface UToolsApi {
    */
   getFileIcon(filePath: string): string;
   /**
+   * 获取当前窗口类型, 'main' 主窗口 | 'detach' 分离窗口 | 'browser' 由 createBrowserWindow 创建的窗口
+   */
+  getWindowType(): 'main' | 'detach' | 'browser';
+  /**
    * 复制文件到剪贴板
    */
   copyFile(file: string | string[]): boolean;
@@ -509,6 +513,10 @@ interface UToolsApi {
    * 默认方式打开给定的文件
    */
   shellOpenPath(fullPath: string): void;
+  /**
+   * 删除文件到回收站
+   */
+  shellTrashItem(filename: string): Promise<void>;
   /**
    * 在文件管理器中显示给定的文件
    */
@@ -577,6 +585,22 @@ interface UToolsApi {
    * 获取矩形所在的显示器
    */
   getDisplayMatching(rect: { x: number, y: number, width: number, height: number }): Display;
+  /**
+   * 屏幕物理坐标转 DIP 坐标
+   */
+  screenToDipPoint(point: { x: number, y: number }): { x: number, y: number };
+  /**
+   * 屏幕 DIP 坐标转物理坐标
+   */
+  dipToScreenPoint(point: { x: number, y: number }): { x: number, y: number };
+  /**
+   * 屏幕物理区域转 DIP 区域
+   */
+  screenToDipRect(rect: { x: number, y: number, width: number, height: number }): { x: number, y: number, width: number, height: number };
+    /**
+   * 屏幕 DIP 区域转物理区域
+   */
+  dipToScreenRect(rect: { x: number, y: number, width: number, height: number }): { x: number, y: number, width: number, height: number };
   /**
    * 录屏源
    */
