@@ -227,15 +227,37 @@ interface DbReturn {
   message?: string
 }
 
+interface PluginFeature {
+  code: string,
+  explain?: string,
+  platform?: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
+  icon?: string,
+  cmds: (string | {
+    type: 'img' | 'files' | 'regex' | 'over' | 'window',
+    label: string
+  })[]
+  /**
+   * @version >= 5.2.0
+   * 设置为 `true` 时，启动对应的 `feature` 不会弹出主面板
+   */
+  mainHide?: boolean
+}
+
+type PluginEnterFrom =
+  | 'main'
+  | 'panel'
+  | 'hotkey'
+  | 'redirect'
+
 interface UToolsApi {
   /**
    * 插件应用进入时触发
    */
-  onPluginEnter(callback: (action: {code: string, type: string, payload: any, option: any }) => void): void;
+  onPluginEnter(callback: (action: { code: string, type: string, payload: any, option: any, from?: PluginEnterFrom }) => void): void;
   /**
   * 向搜索面板推送消息
   */
-  onMainPush(callback: (action: {code: string, type: string, payload: any }) => { icon?: string, text: string, title?: string }[], selectCallback: (action: {code: string, type: string, payload: any,  option: { icon?: string, text: string, title?: string }}) => void): void;
+  onMainPush(callback: (action: { code: string, type: string, payload: any }) => { icon?: string, text: string, title?: string }[], selectCallback: (action: { code: string, type: string, payload: any, option: { icon?: string, text: string, title?: string } }) => void): void;
   /**
    * 插件应用隐藏后台或完全退出时触发
    */
@@ -267,7 +289,7 @@ interface UToolsApi {
    * @param placeholder 占位符， 默认为空
    * @param isFocus 是否获得焦点，默认为 true
    */
-  setSubInput(onChange: ({text: string}) => void, placeholder?: string, isFocus?: boolean): boolean;
+  setSubInput(onChange: (input: { text: string }) => void, placeholder?: string, isFocus?: boolean): boolean;
   /**
    * 移除子输入框
    */
@@ -297,8 +319,9 @@ interface UToolsApi {
   createBrowserWindow(url: string, options: { width?: number, height?: number }, callback?: () => void): { id: number, [key: string]: any, webContents: { id: number, [key: string]: any } };
   /**
    * 隐藏插件应用到后台
+   * @param {boolean|undefined} isKill 设置为 `true` 时，会将插件进程杀死
    */
-  outPlugin(): boolean;
+  outPlugin(isKill?: boolean): boolean;
   /**
    * 是否深色模式
    */
@@ -358,16 +381,7 @@ interface UToolsApi {
   /**
    * 设置插件应用动态功能
    */
-  setFeature(feature: {
-    code: string,
-    explain: string,
-    platform: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
-    icon?: string,
-    cmds: (string | {
-      type: 'img' | 'files' | 'regex' | 'over' | 'window',
-      label: string
-    })[]
-  }): boolean;
+  setFeature(feature: PluginFeature): boolean;
   /**
    * 移除插件应用动态功能
    */
@@ -375,16 +389,7 @@ interface UToolsApi {
   /**
    * 获取插件应用动态功能，参数为空获取所有动态功能
    */
-  getFeatures(codes?: string[]): {
-    code: string,
-    explain: string,
-    platform: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
-    icon?: string,
-    cmds: string | {
-      type: 'img' | 'files' | 'regex' | 'over' | 'window',
-      label: string
-    }[]
-  }[];
+  getFeatures(codes?: string[]): PluginFeature[];
   /**
    * 插件应用间跳转
    */
@@ -392,11 +397,11 @@ interface UToolsApi {
   /**
    * 获取闲置的 ubrowser
    */
-  getIdleUBrowsers(): { id: number, title: string, url: string}[];
+  getIdleUBrowsers(): { id: number, title: string, url: string }[];
   /**
    * 设置 ubrowser 代理 https://www.electronjs.org/docs/api/session#sessetproxyconfig
    */
-  setUBrowserProxy(config: {pacScript?: string, proxyRules?: string, proxyBypassRules?: string}): boolean;
+  setUBrowserProxy(config: { pacScript?: string, proxyRules?: string, proxyBypassRules?: string }): boolean;
   /**
    * 清空 ubrowser 缓存
    */
@@ -444,7 +449,7 @@ interface UToolsApi {
   /**
    * 停止插件应用页面中查找
    */
-  stopFindInPage (action: 'clearSelection' | 'keepSelection' | 'activateSelection'): void;
+  stopFindInPage(action: 'clearSelection' | 'keepSelection' | 'activateSelection'): void;
   /**
    * 拖拽文件
    */
@@ -597,14 +602,14 @@ interface UToolsApi {
    * 屏幕物理区域转 DIP 区域
    */
   screenToDipRect(rect: { x: number, y: number, width: number, height: number }): { x: number, y: number, width: number, height: number };
-    /**
-   * 屏幕 DIP 区域转物理区域
-   */
+  /**
+ * 屏幕 DIP 区域转物理区域
+ */
   dipToScreenRect(rect: { x: number, y: number, width: number, height: number }): { x: number, y: number, width: number, height: number };
   /**
    * 录屏源
    */
-  desktopCaptureSources(options: { types: string[], thumbnailSize?: { width: number, height: number }, fetchWindowIcons?: boolean }):Promise<{appIcon: {}, display_id: string, id: string, name: string, thumbnail: {} }>;
+  desktopCaptureSources(options: { types: string[], thumbnailSize?: { width: number, height: number }, fetchWindowIcons?: boolean }): Promise<{ appIcon: {}, display_id: string, id: string, name: string, thumbnail: {} }>;
   /**
    * 是否开发中
    */
@@ -718,15 +723,15 @@ interface UToolsApi {
      * @param key 键名(同时为文档ID)
      * @param value 键值
      */
-    setItem (key: string, value: any): void;
+    setItem(key: string, value: any): void;
     /**
      * 获取键名对应的值
      */
-    getItem (key: string): any;
+    getItem(key: string): any;
     /**
      * 删除键值对(删除文档)
      */
-    removeItem (key: string): void;
+    removeItem(key: string): void;
   };
 
   ubrowser: UBrowser;

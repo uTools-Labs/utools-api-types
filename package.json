@@ -1,20 +1,18 @@
 {
   "name": "utools-api-types",
-  "version": "5.0.0",
+  "version": "5.2.0",
   "description": "TypeScript definitions for uTools API",
   "repository": {
     "type": "git",
-    "url": "https://github.com/uTools-Labs/utools-api-types.git"
+    "url": "https://github.com/uTools-Labs/utools-api-types"
   },
   "keywords": [
     "uTools"
   ],
-  "author": "utools-labs",
+  "author": "utools-core",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/uTools-Labs/utools-api-types/issues"
   },
-  "homepage": "https://github.com/uTools-Labs/utools-api-types#readme",
-  "main": "",
-  "types": "index.d.ts"
+  "homepage": "https://github.com/uTools-Labs/utools-api-types#readme"
 }
