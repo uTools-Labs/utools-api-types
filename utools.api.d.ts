@@ -231,7 +231,7 @@ interface UToolsApi {
   /**
    * 插件应用进入时触发
    */
-  onPluginEnter(callback: (action: {code: string, type: string, payload: any, option: any }) => void): void;
+  onPluginEnter(callback: (action: {code: string, type: string, payload: any, from : 'main' | 'panel' | 'hotkey' | 'redirect', option?: any }) => void): void;
   /**
   * 向搜索面板推送消息
   */
@@ -298,7 +298,7 @@ interface UToolsApi {
   /**
    * 隐藏插件应用到后台
    */
-  outPlugin(): boolean;
+  outPlugin(isKill?: boolean): boolean;
   /**
    * 是否深色模式
    */
@@ -361,8 +361,10 @@ interface UToolsApi {
   setFeature(feature: {
     code: string,
     explain: string,
-    platform: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
+    platform?: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
     icon?: string,
+    mainHide?: boolean,
+    mainPush?: boolean,
     cmds: (string | {
       type: 'img' | 'files' | 'regex' | 'over' | 'window',
       label: string
