@@ -241,6 +241,7 @@ interface PluginFeature {
    * 设置为 `true` 时，启动对应的 `feature` 不会弹出主面板
    */
   mainHide?: boolean
+  mainPush?: boolean
 }
 
 type PluginEnterFrom =
@@ -321,6 +322,7 @@ interface UToolsApi {
    * 隐藏插件应用到后台
    * @param {boolean|undefined} isKill 设置为 `true` 时，会将插件进程杀死
    */
+  outPlugin(isKill?: boolean): boolean;
   outPlugin(isKill?: boolean): boolean;
   /**
    * 是否深色模式
