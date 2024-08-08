@@ -1,3 +1,4 @@
+/// <reference path="electron.utools.d.ts"/>
 interface UBrowser {
   /**
    * 设置 User-Agent
@@ -82,7 +83,7 @@ interface UBrowser {
    * @param func 在目标网页中执行
    * @param params 传到 func 中的参数
    */
-  evaluate(func: (...params: any[]) => any, ...params: any[]): this;
+  evaluate<T extends any[]>(func: (...params: T) => any, ...params: T): this;
   /**
    * 等待时间
    * @param ms 毫秒
@@ -100,7 +101,7 @@ interface UBrowser {
    * @param timeout 超时 默认60000 ms(60秒)
    * @param params 传到 func 中的参数
    */
-  wait(func: (...params: any[]) => boolean, timeout?: number, ...params: any[]): this;
+  wait<T extends any[]>(func: (...params: T) => boolean, timeout?: number, ...params: T): this;
   /**
    * 当元素存在时执行直到碰到 end
    * @param selector DOM元素
@@ -111,7 +112,7 @@ interface UBrowser {
    * @param func 执行的JS函数
    * @param params 传到 func 中的参数
    */
-  when(func: (...params: any[]) => boolean, ...params: any[]): this;
+  when<T extends any[]>(func: (...params: T) => boolean, ...params: T): this;
   /**
    * 配合 when 使用
    */
@@ -167,7 +168,7 @@ interface UBrowser {
    * 当运行结束后，窗口如果为隐藏状态将自动销毁窗口
    * @param options
    */
-  run(options: {
+  run<T extends any = any[]>(options: {
     show?: boolean,
     width?: number,
     height?: number,
@@ -187,12 +188,12 @@ interface UBrowser {
     fullscreenable?: boolean,
     enableLargerThanScreen?: boolean,
     opacity?: number
-  }): Promise<any[]>;
+  }): Promise<T>;
   /**
    * 运行在闲置的 ubrowser 上
    * @param ubrowserId 1. run(options) 运行结束后, 当 ubrowser 实例窗口仍然显示时返回 2. utools.getIdleUBrowsers() 中获得
    */
-  run(ubrowserId: number): Promise<any[]>;
+  run<T extends any = any[]>(ubrowserId: number): Promise<T>;
 }
 
 interface Display {
@@ -212,11 +213,10 @@ interface Display {
   workAreaSize: { width: number, height: number };
 }
 
-interface DbDoc {
+type DbDoc<T extends {} = Record<string, any>> = {
   _id: string,
   _rev?: string,
-  [key: string]: any
-}
+} & T
 
 interface DbReturn {
   id: string,
@@ -254,11 +254,11 @@ interface UToolsApi {
   /**
    * 插件应用进入时触发
    */
-  onPluginEnter(callback: (action: { code: string, type: string, payload: any, option: any, from?: PluginEnterFrom }) => void): void;
+  onPluginEnter<T = any, L = any>(callback: (action: { code: string, type: string, payload: T, option: L, from?: PluginEnterFrom }) => void): void;
   /**
   * 向搜索面板推送消息
   */
-  onMainPush(callback: (action: { code: string, type: string, payload: any }) => { icon?: string, text: string, title?: string }[], selectCallback: (action: { code: string, type: string, payload: any, option: { icon?: string, text: string, title?: string } }) => void): void;
+  onMainPush<T = any>(callback: (action: { code: string, type: string, payload: T }) => { icon?: string, text: string, title?: string }[], selectCallback: (action: { code: string, type: string, payload: any, option: { icon?: string, text: string, title?: string } }) => void): void;
   /**
    * 插件应用隐藏后台或完全退出时触发
    */
@@ -270,7 +270,7 @@ interface UToolsApi {
   /**
    * 插件应用从云端拉取到数据时触发
    */
-  onDbPull(callback: (docs: { _id: string, _rev: string }[]) => void): void;
+  onDbPull<T extends {} = Record<string, any>>(callback: (docs: DbDoc<T>[]) => void): void;
   /**
    * 隐藏主窗口
    * @param isRestorePreWindow 是否焦点回归到前面的活动窗口，默认 true
@@ -317,12 +317,11 @@ interface UToolsApi {
    * @param options 参考 https://www.electronjs.org/docs/api/browser-window#new-browserwindowoptions
    * @param callback url 加载完成时的回调
    */
-  createBrowserWindow(url: string, options: { width?: number, height?: number }, callback?: () => void): { id: number, [key: string]: any, webContents: { id: number, [key: string]: any } };
+  createBrowserWindow(url: string, options: BrowserWindow.InitOptions, callback?: () => void): { id: number, [key: string]: any, webContents: { id: number, [key: string]: any } };
   /**
    * 隐藏插件应用到后台
    * @param {boolean|undefined} isKill 设置为 `true` 时，会将插件进程杀死
    */
-  outPlugin(isKill?: boolean): boolean;
   outPlugin(isKill?: boolean): boolean;
   /**
    * 是否深色模式
@@ -547,7 +546,7 @@ interface UToolsApi {
   /*
   * 粘贴图像
   */
-  hideMainWindowPasteImage(img: string): void;
+  hideMainWindowPasteImage(img: string | Uint8Array): void;
   /*
   * 粘贴文本
   */
@@ -637,7 +636,7 @@ interface UToolsApi {
     /**
      * 获取文档
      */
-    get(id: string): DbDoc | null;
+    get<T extends {} = Record<string, any>>(id: string): DbDoc<T> | null;
     /**
      * 删除文档
      */
@@ -649,7 +648,7 @@ interface UToolsApi {
     /**
      * 获取所有文档 可根据文档id前缀查找
      */
-    allDocs(key?: string): DbDoc[];
+    allDocs<T extends {} = Record<string, any>>(key?: string): DbDoc<T>[];
     /**
      * 存储附件到新文档
      * @param docId 文档ID
