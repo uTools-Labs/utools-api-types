@@ -21,6 +21,7 @@ declare module BrowserWindow {
     skipTaskbar?: true
     closable?: boolean
     frame?: boolean
+    alwayOnTop?: boolean
     [key: string]: any
   }
 
@@ -137,15 +138,72 @@ declare module BrowserWindow {
     [key: string]: any
   }
 
+  interface Rectangle {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
+
   interface WindowInstance {
     id: number
-    webContent: WebContents
+    webContents: WebContents
     show: () => void
     hide: () => void
     destory: () => void
     close: () => void
     isFocused: () => boolean
     isDestroyed: () => boolean
+    setResizable: (resizable: boolean) => void
+    setSize: (width: number, height: number) => void
+    getSize: () => [width: number, height: number]
+    isVisible: () => boolean
+    maximize: () => void
+    unmaximize: () => void
+    isMaximized: () => void
+    minimize: () => void
+    restore: () => void
+    isMinimized: () => boolean
+    setFullScreen: (flag: boolean) => void
+    isFullScreen: () => boolean
+    isNormal: () => boolean
+    setAspectRatio: (aspectiRotio: number) => void
+    setBackgroundColor: (backgroundColor: string) => void
+    getBounds: () => Rectangle
+    getBackgroundColor: () => string
+    setContentBounds: (bounds: Rectangle) => void
+    getContentBounds: () => Rectangle
+    getNormalBounds: () => Rectangle
+    setEnabled: (enable: boolean) => void
+    isEnabled: () => boolean
+    setContentSize: (width: number, height: number) => void
+    getContentSize: () => [width: number, height: number]
+    setMinimumSize: (width: number, height: number) => void
+    getMinimumSize: () => [width: number, height: number]
+    setMaximumSize: (width: number, height: number) => void
+    getMaximumSize: () => [width: number, height: number]
+    isResizable: () => boolean
+    setFullScreenable: (fullscreenable: boolean) => void
+    isFullScreenable: () => boolean
+    setClosable: (closable: boolean) => void
+    isClosable: () => boolean
+    setAlwaysOnTop: (flag: boolean) => void
+    isAlwaysOnTop: () => boolean
+    moveTop: () => void
+    setPosition: (x: number, y: number) => void
+    getPosition: () => [x: number, y: number]
+    setTitle: (title: string) => void
+    getTitle: () => string
+    flashFrame: (flag: boolean) => void
+    setKiosk: (flag: boolean) => void
+    isKiosk: () => boolean
+    focusOnWebView: () => void
+    blurWebView: () => void
+    capturePage: (rect?: Rectangle, options?: {
+      stayHidden?: boolean
+      stayAwake?: boolean
+    }) => Promise<NativeImage>
+    reload: () => void
 
     [key: string]: any
   }

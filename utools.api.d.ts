@@ -317,7 +317,7 @@ interface UToolsApi {
    * @param options 参考 https://www.electronjs.org/docs/api/browser-window#new-browserwindowoptions
    * @param callback url 加载完成时的回调
    */
-  createBrowserWindow(url: string, options: BrowserWindow.InitOptions, callback?: () => void): { id: number, [key: string]: any, webContents: { id: number, [key: string]: any } };
+  createBrowserWindow(url: string, options: BrowserWindow.InitOptions, callback?: () => void): BrowserWindow.WindowInstance;
   /**
    * 隐藏插件应用到后台
    * @param {boolean|undefined} isKill 设置为 `true` 时，会将插件进程杀死
@@ -393,6 +393,7 @@ interface UToolsApi {
   getFeatures(codes?: string[]): PluginFeature[];
   /**
    * 插件应用间跳转
+   * @todo 创建针对type的多个重载
    */
   redirect(label: string | string[], payload: string | { type: 'text' | 'img' | 'files', data: any }): void;
   /**
@@ -410,7 +411,7 @@ interface UToolsApi {
   /**
    * 显示系统通知
    */
-  showNotification(body: string): void;
+  showNotification(body: string, featureName?: string): void;
   /**
    * 弹出文件选择框
    */
@@ -728,7 +729,7 @@ interface UToolsApi {
     /**
      * 获取键名对应的值
      */
-    getItem(key: string): any;
+    getItem<T = any>(key: string): T;
     /**
      * 删除键值对(删除文档)
      */
