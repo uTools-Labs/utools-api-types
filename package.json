@@ -15,6 +15,7 @@
     "url": "https://github.com/uTools-Labs/utools-api-types/issues"
   },
   "homepage": "https://github.com/uTools-Labs/utools-api-types#readme",
+  "readme": "./README.md",
   "exports": {
     "default": {
       "types": "./utools.api.d.ts"
