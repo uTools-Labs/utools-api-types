@@ -1,3 +1,5 @@
+/// <reference path="ubw.d.ts"/>
+/// <reference path="electron.d.ts"/>
 interface UBrowser {
   /**
    * 设置 User-Agent
@@ -82,7 +84,7 @@ interface UBrowser {
    * @param func 在目标网页中执行
    * @param params 传到 func 中的参数
    */
-  evaluate(func: (...params: any[]) => any, ...params: any[]): this;
+  evaluate<T extends any[]>(func: (...params: T) => any, ...params: T): this;
   /**
    * 等待时间
    * @param ms 毫秒
@@ -100,7 +102,7 @@ interface UBrowser {
    * @param timeout 超时 默认60000 ms(60秒)
    * @param params 传到 func 中的参数
    */
-  wait(func: (...params: any[]) => boolean, timeout?: number, ...params: any[]): this;
+  wait<T extends any[]>(func: (...params: T) => boolean, timeout?: number, ...params: T): this;
   /**
    * 当元素存在时执行直到碰到 end
    * @param selector DOM元素
@@ -111,7 +113,7 @@ interface UBrowser {
    * @param func 执行的JS函数
    * @param params 传到 func 中的参数
    */
-  when(func: (...params: any[]) => boolean, ...params: any[]): this;
+  when<T extends any[]>(func: (...params: T) => boolean, ...params: T): this;
   /**
    * 配合 when 使用
    */
@@ -167,7 +169,7 @@ interface UBrowser {
    * 当运行结束后，窗口如果为隐藏状态将自动销毁窗口
    * @param options
    */
-  run(options: {
+  run<T extends any = any[]>(options: {
     show?: boolean,
     width?: number,
     height?: number,
@@ -187,12 +189,12 @@ interface UBrowser {
     fullscreenable?: boolean,
     enableLargerThanScreen?: boolean,
     opacity?: number
-  }): Promise<any[]>;
+  }): Promise<T>;
   /**
    * 运行在闲置的 ubrowser 上
    * @param ubrowserId 1. run(options) 运行结束后, 当 ubrowser 实例窗口仍然显示时返回 2. utools.getIdleUBrowsers() 中获得
    */
-  run(ubrowserId: number): Promise<any[]>;
+  run<T extends any = any[]>(ubrowserId: number): Promise<T>;
 }
 
 interface Display {
@@ -212,11 +214,10 @@ interface Display {
   workAreaSize: { width: number, height: number };
 }
 
-interface DbDoc {
+type DbDoc<T extends {} = Record<string, any>> = {
   _id: string,
   _rev?: string,
-  [key: string]: any
-}
+} & T
 
 interface DbReturn {
   id: string,
@@ -227,15 +228,38 @@ interface DbReturn {
   message?: string
 }
 
+interface PluginFeature {
+  code: string,
+  explain?: string,
+  platform?: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
+  icon?: string,
+  cmds: (string | {
+    type: 'img' | 'files' | 'regex' | 'over' | 'window',
+    label: string
+  })[]
+  /**
+   * @version >= 5.2.0
+   * 设置为 `true` 时，启动对应的 `feature` 不会弹出主面板
+   */
+  mainHide?: boolean
+  mainPush?: boolean
+}
+
+type PluginEnterFrom =
+  | 'main'
+  | 'panel'
+  | 'hotkey'
+  | 'redirect'
+
 interface UToolsApi {
   /**
    * 插件应用进入时触发
    */
-  onPluginEnter(callback: (action: {code: string, type: string, payload: any, from : 'main' | 'panel' | 'hotkey' | 'redirect', option?: any }) => void): void;
+  onPluginEnter<T = any, L = any>(callback: (action: { code: string, type: string, payload: T, option: L, from?: PluginEnterFrom }) => void): void;
   /**
   * 向搜索面板推送消息
   */
-  onMainPush(callback: (action: {code: string, type: string, payload: any }) => { icon?: string, text: string, title?: string }[], selectCallback: (action: {code: string, type: string, payload: any,  option: { icon?: string, text: string, title?: string }}) => void): void;
+  onMainPush<T = any>(callback: (action: { code: string, type: string, payload: T }) => { icon?: string, text: string, title?: string }[], selectCallback: (action: { code: string, type: string, payload: any, option: { icon?: string, text: string, title?: string } }) => void): void;
   /**
    * 插件应用隐藏后台或完全退出时触发
    */
@@ -247,7 +271,7 @@ interface UToolsApi {
   /**
    * 插件应用从云端拉取到数据时触发
    */
-  onDbPull(callback: (docs: { _id: string, _rev: string }[]) => void): void;
+  onDbPull<T extends {} = Record<string, any>>(callback: (docs: DbDoc<T>[]) => void): void;
   /**
    * 隐藏主窗口
    * @param isRestorePreWindow 是否焦点回归到前面的活动窗口，默认 true
@@ -267,7 +291,7 @@ interface UToolsApi {
    * @param placeholder 占位符， 默认为空
    * @param isFocus 是否获得焦点，默认为 true
    */
-  setSubInput(onChange: ({text: string}) => void, placeholder?: string, isFocus?: boolean): boolean;
+  setSubInput(onChange: (input: { text: string }) => void, placeholder?: string, isFocus?: boolean): boolean;
   /**
    * 移除子输入框
    */
@@ -294,9 +318,10 @@ interface UToolsApi {
    * @param options 参考 https://www.electronjs.org/docs/api/browser-window#new-browserwindowoptions
    * @param callback url 加载完成时的回调
    */
-  createBrowserWindow(url: string, options: { width?: number, height?: number }, callback?: () => void): { id: number, [key: string]: any, webContents: { id: number, [key: string]: any } };
+  createBrowserWindow(url: string, options: BrowserWindow.InitOptions, callback?: () => void): BrowserWindow.WindowInstance;
   /**
    * 隐藏插件应用到后台
+   * @param {boolean|undefined} isKill 设置为 `true` 时，会将插件进程杀死
    */
   outPlugin(isKill?: boolean): boolean;
   /**
@@ -358,18 +383,7 @@ interface UToolsApi {
   /**
    * 设置插件应用动态功能
    */
-  setFeature(feature: {
-    code: string,
-    explain: string,
-    platform?: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
-    icon?: string,
-    mainHide?: boolean,
-    mainPush?: boolean,
-    cmds: (string | {
-      type: 'img' | 'files' | 'regex' | 'over' | 'window',
-      label: string
-    })[]
-  }): boolean;
+  setFeature(feature: PluginFeature): boolean;
   /**
    * 移除插件应用动态功能
    */
@@ -377,28 +391,20 @@ interface UToolsApi {
   /**
    * 获取插件应用动态功能，参数为空获取所有动态功能
    */
-  getFeatures(codes?: string[]): {
-    code: string,
-    explain: string,
-    platform: ('darwin' | 'win32' | 'linux') | (Array<'darwin' | 'win32' | 'linux'>),
-    icon?: string,
-    cmds: string | {
-      type: 'img' | 'files' | 'regex' | 'over' | 'window',
-      label: string
-    }[]
-  }[];
+  getFeatures(codes?: string[]): PluginFeature[];
   /**
    * 插件应用间跳转
+   * @todo 创建针对type的多个重载
    */
   redirect(label: string | string[], payload: string | { type: 'text' | 'img' | 'files', data: any }): void;
   /**
    * 获取闲置的 ubrowser
    */
-  getIdleUBrowsers(): { id: number, title: string, url: string}[];
+  getIdleUBrowsers(): { id: number, title: string, url: string }[];
   /**
    * 设置 ubrowser 代理 https://www.electronjs.org/docs/api/session#sessetproxyconfig
    */
-  setUBrowserProxy(config: {pacScript?: string, proxyRules?: string, proxyBypassRules?: string}): boolean;
+  setUBrowserProxy(config: { pacScript?: string, proxyRules?: string, proxyBypassRules?: string }): boolean;
   /**
    * 清空 ubrowser 缓存
    */
@@ -406,7 +412,7 @@ interface UToolsApi {
   /**
    * 显示系统通知
    */
-  showNotification(body: string): void;
+  showNotification(body: string, featureName?: string): void;
   /**
    * 弹出文件选择框
    */
@@ -446,7 +452,7 @@ interface UToolsApi {
   /**
    * 停止插件应用页面中查找
    */
-  stopFindInPage (action: 'clearSelection' | 'keepSelection' | 'activateSelection'): void;
+  stopFindInPage(action: 'clearSelection' | 'keepSelection' | 'activateSelection'): void;
   /**
    * 拖拽文件
    */
@@ -542,7 +548,7 @@ interface UToolsApi {
   /*
   * 粘贴图像
   */
-  hideMainWindowPasteImage(img: string): void;
+  hideMainWindowPasteImage(img: string | Uint8Array): void;
   /*
   * 粘贴文本
   */
@@ -599,14 +605,14 @@ interface UToolsApi {
    * 屏幕物理区域转 DIP 区域
    */
   screenToDipRect(rect: { x: number, y: number, width: number, height: number }): { x: number, y: number, width: number, height: number };
-    /**
-   * 屏幕 DIP 区域转物理区域
-   */
+  /**
+ * 屏幕 DIP 区域转物理区域
+ */
   dipToScreenRect(rect: { x: number, y: number, width: number, height: number }): { x: number, y: number, width: number, height: number };
   /**
    * 录屏源
    */
-  desktopCaptureSources(options: { types: string[], thumbnailSize?: { width: number, height: number }, fetchWindowIcons?: boolean }):Promise<{appIcon: {}, display_id: string, id: string, name: string, thumbnail: {} }>;
+  desktopCaptureSources(options: { types: string[], thumbnailSize?: { width: number, height: number }, fetchWindowIcons?: boolean }): Promise<{ appIcon: {}, display_id: string, id: string, name: string, thumbnail: {} }>;
   /**
    * 是否开发中
    */
@@ -632,7 +638,7 @@ interface UToolsApi {
     /**
      * 获取文档
      */
-    get(id: string): DbDoc | null;
+    get<T extends {} = Record<string, any>>(id: string): DbDoc<T> | null;
     /**
      * 删除文档
      */
@@ -644,7 +650,7 @@ interface UToolsApi {
     /**
      * 获取所有文档 可根据文档id前缀查找
      */
-    allDocs(key?: string): DbDoc[];
+    allDocs<T extends {} = Record<string, any>>(key?: string): DbDoc<T>[];
     /**
      * 存储附件到新文档
      * @param docId 文档ID
@@ -720,15 +726,15 @@ interface UToolsApi {
      * @param key 键名(同时为文档ID)
      * @param value 键值
      */
-    setItem (key: string, value: any): void;
+    setItem(key: string, value: any): void;
     /**
      * 获取键名对应的值
      */
-    getItem (key: string): any;
+    getItem<T = any>(key: string): T;
     /**
      * 删除键值对(删除文档)
      */
-    removeItem (key: string): void;
+    removeItem(key: string): void;
   };
 
   ubrowser: UBrowser;
