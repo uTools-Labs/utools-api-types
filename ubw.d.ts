@@ -208,3 +208,4 @@ declare module BrowserWindow {
     [key: string]: any
   }
 }
+

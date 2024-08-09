@@ -1,4 +1,5 @@
-/// <reference path="electron.utools.d.ts"/>
+/// <reference path="ubw.d.ts"/>
+/// <reference path="electron.d.ts"/>
 interface UBrowser {
   /**
    * 设置 User-Agent

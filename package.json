@@ -14,5 +14,10 @@
   "bugs": {
     "url": "https://github.com/uTools-Labs/utools-api-types/issues"
   },
-  "homepage": "https://github.com/uTools-Labs/utools-api-types#readme"
+  "homepage": "https://github.com/uTools-Labs/utools-api-types#readme",
+  "exports": {
+    "default": {
+      "types": "./utools.api.d.ts"
+    }
+  }
 }
