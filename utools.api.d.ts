@@ -1,5 +1,25 @@
 /// <reference path="ubw.d.ts"/>
 /// <reference path="electron.d.ts"/>
+
+interface UTeamPreset<T = unknown> {
+  key: string
+  value: T
+}
+
+interface UTeamFeaturePreset<V> extends UTeamPreset<
+  PluginFeature & {
+    extend?: V
+  }
+> {
+  key: `feature:${string}`
+}
+
+
+interface UTeam {
+  allPresets: (match?: string) => Promise<UTeamPreset>
+  preset: <T = unknown>(key: string) => UTeamPreset<T>
+}
+
 interface UBrowser {
   /**
    * 设置 User-Agent
@@ -738,6 +758,8 @@ interface UToolsApi {
   };
 
   ubrowser: UBrowser;
+
+  team: UTeam;
 }
 
 declare var utools: UToolsApi;
