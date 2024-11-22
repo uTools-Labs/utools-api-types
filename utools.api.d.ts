@@ -14,10 +14,19 @@ interface UTeamFeaturePreset<V> extends UTeamPreset<
   key: `feature:${string}`
 }
 
+interface UTeamInfo {
+  teamId: string
+  teamLogo: string
+  teamName: string
+  userAvatar: string
+  userId: string
+  userName: string
+}
 
 interface UTeam {
-  allPresets: (match?: string) => Promise<UTeamPreset>
-  preset: <T = unknown>(key: string) => UTeamPreset<T>
+  allPresets: (match?: string) => Promise<UTeamPreset[]>
+  preset: <T = unknown>(key: string) => T
+  info: () => UTeamInfo
 }
 
 interface UBrowser {
