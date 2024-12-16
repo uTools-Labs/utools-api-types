@@ -52,7 +52,7 @@ interface UBrowser {
   /**
    * 模拟设备
    */
-  device(arg: ('iPhone 11' | 'iPhone X' | 'iPad' | 'iPhone 6/7/8 Plus' | 'iPhone 6/7/8' | 'iPhone 5/SE' | 'HUAWEI Mate10' | 'HUAWEI Mate20' | 'HUAWEI Mate30' | 'HUAWEI Mate30 Pro') | { size: { width: number, height: number }, useragent: string }): this;
+  device(arg: { size: { width: number, height: number }, useragent: string }): this;
   /**
    * 获取 cookie
    * @param name 为空获取全部cookie
@@ -104,7 +104,7 @@ interface UBrowser {
    */
   wait<T extends any[]>(func: (...params: T) => boolean, timeout?: number, ...params: T): this;
   /**
-   * 当元素存在时执行直到碰到 end
+   * 当元素存在时执行，直到碰到 end
    * @param selector DOM元素
    */
   when(selector: string): this;
@@ -164,6 +164,10 @@ interface UBrowser {
    * 下载文件
    */
   download(url: string, savePath?: string): this;
+  /**
+   * 下载文件
+   */
+  download(func: (...params: any[]) => string, savePath: string | null, ...params: any[]): this;
   /**
    * 启动一个 ubrowser 运行
    * 当运行结束后，窗口如果为隐藏状态将自动销毁窗口
@@ -237,10 +241,6 @@ interface PluginFeature {
     type: 'img' | 'files' | 'regex' | 'over' | 'window',
     label: string
   })[]
-  /**
-   * @version >= 5.2.0
-   * 设置为 `true` 时，启动对应的 `feature` 不会弹出主面板
-   */
   mainHide?: boolean
   mainPush?: boolean
 }
@@ -736,6 +736,45 @@ interface UToolsApi {
      */
     removeItem(key: string): void;
   };
+
+  dbCryptoStorage: {
+    /**
+     * 键值对加密存储，如果键名存在，则更新其对应的值
+     * @param key 键名(同时为文档ID)
+     * @param value 键值
+     */
+    setItem(key: string, value: any): void;
+    /**
+     * 获取键名对应的值
+     */
+    getItem<T = any>(key: string): T;
+    /**
+     * 删除键值对(删除文档)
+     */
+    removeItem(key: string): void;
+  };
+
+  team: {
+    /**
+     * 获取团队信息 
+     */
+    info(): {
+      teamId: string,
+      teamName: string,
+      teamLogo: string,
+      userId: string,
+      userName: string,
+      userAvatar: string
+    };
+    /**
+     * 获取团队版预设键名对应的值
+     */
+    preset<T = any>(key: string): T;
+    /**
+     * 获取团队版预设的所有数据
+     */
+    allPresets(): Promise<{ key: string, value: any }[]>;
+  }
 
   ubrowser: UBrowser;
 }
