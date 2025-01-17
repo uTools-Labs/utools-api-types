@@ -280,6 +280,22 @@ type PluginEnterFrom =
   | 'hotkey'
   | 'redirect'
 
+interface FfmpegRunProgress {
+  bitrate: string;
+  fps: number;
+  frame: number;
+  percent?: number;
+  q: number | string;
+  size: string;
+  speed: string;
+  time: string;
+}
+
+interface FfmpegPromise extends Promise<void> {
+  kill(): void;
+  quit(): void;
+}
+
 interface UToolsApi {
   /**
    * 插件应用进入时触发
@@ -769,6 +785,21 @@ interface UToolsApi {
   ubrowser: UBrowser;
 
   team: UTeam;
+
+  /**
+   * 运行 ffmpeg
+   * @param args ffmpeg 命令行参数
+   * @param onProgress 进度回调
+   */
+  runFFmpeg(args: string[], onProgress?: () => FfmpegRunProgress): FfmpegPromise;
+
+  /**
+   * 发送消息到父窗口
+   * **仅在 `createBrowserWindow` 创建的窗口中有效**
+   * @param channel 通道名
+   * @param data 数据
+   */
+  sendToParent(channel: string, ...data: any[]): void;
 }
 
 declare var utools: UToolsApi;

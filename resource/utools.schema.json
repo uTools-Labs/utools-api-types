@@ -19,13 +19,18 @@
     },
     "platform": {
       "type": "array",
-      "description": "插件支持的平台，默认为所有平台。",
+      "description": "（已弃用）插件支持的平台，默认为所有平台。",
+      "deprecated": {
+        "deprecatedOn": "20241216",
+        "description": "现在请在开发者工具中直接设置平台"
+      },
       "items": {
         "type": "string",
         "enum": [
           "win32",
           "darwin",
-          "linux"
+          "linux",
+          "当前字段已被弃用"
         ]
       }
     },
@@ -74,13 +79,18 @@
           },
           "platform": {
             "type": "array",
-            "description": "此功能的支持平台，默认为所有平台。",
+            "description": "（已弃用）此功能的支持平台，默认为所有平台。",
+            "deprecated": {
+              "deprecatedOn": "20241216",
+              "description": "现在请在开发者工具中直接设置平台"
+            },
             "items": {
               "type": "string",
               "enum": [
                 "win32",
                 "darwin",
-                "linux"
+                "linux",
+                "当前字段已被弃用"
               ]
             }
           },
@@ -148,8 +158,8 @@
               }
             }
           },
-          "mainHide":{
-            "type":"boolean",
+          "mainHide": {
+            "type": "boolean",
             "description": "设置为 `true` 时，启动对应的 `feature` 不会弹出主面板"
           }
         }
