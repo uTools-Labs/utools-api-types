@@ -1,32 +1,14 @@
 /// <reference path="ubw.d.ts"/>
 /// <reference path="electron.d.ts"/>
 
-interface UTeamPreset<T = unknown> {
-  key: string
-  value: T
-}
-
-interface UTeamFeaturePreset<V> extends UTeamPreset<
-  PluginFeature & {
-    extend?: V
-  }
-> {
-  key: `feature:${string}`
-}
-
-interface UTeamInfo {
-  teamId: string
-  teamLogo: string
-  teamName: string
-  userAvatar: string
-  userId: string
-  userName: string
-}
-
-interface UTeam {
-  allPresets: (match?: string) => Promise<UTeamPreset[]>
-  preset: <T = unknown>(key: string) => T
-  info: () => UTeamInfo
+interface CookieFilter {
+  url ?: string;
+  name?: string;
+  domain?: string;
+  path?: string;
+  secure?: boolean;
+  session?: boolean;
+  httpOnly?: boolean;
 }
 
 interface UBrowser {
@@ -83,10 +65,15 @@ interface UBrowser {
    */
   device(arg: { size: { width: number, height: number }, useragent: string }): this;
   /**
-   * 获取 cookie
-   * @param name 为空获取全部cookie
+   * 在当前 url 根据名称获取 cookie
+   * @param name 为空获取当前 url 全部 cookie
    */
   cookies(name?: string): this;
+  /**
+   * 根据条件获取 ubrowser cookies
+   * @param filter 条件过滤对象
+   */
+  cookies(filter: CookieFilter): this;
   /**
    * 设置Cookie
    */
@@ -365,6 +352,13 @@ interface UToolsApi {
    */
   createBrowserWindow(url: string, options: BrowserWindow.InitOptions, callback?: () => void): BrowserWindow.WindowInstance;
   /**
+   * 发送消息到父窗口
+   * **仅在 `createBrowserWindow` 创建的窗口中使用有效**
+   * @param channel 通道名
+   * @param params 发送的数据
+   */
+  sendToParent(channel: string, ...params: any[]): void;
+  /**
    * 隐藏插件应用到后台
    * @param {boolean|undefined} isKill 设置为 `true` 时，会将插件进程杀死
    */
@@ -441,7 +435,7 @@ interface UToolsApi {
    * 插件应用间跳转
    * @todo 创建针对type的多个重载
    */
-  redirect(label: string | string[], payload: string | { type: 'text' | 'img' | 'files', data: any }): void;
+  redirect(label: string | string[], payload: string | { type: 'text' | 'img' | 'files', data: any }): boolean;
   /**
    * 获取闲置的 ubrowser
    */
@@ -823,21 +817,12 @@ interface UToolsApi {
 
   ubrowser: UBrowser;
 
-
   /**
    * 运行 ffmpeg
    * @param args ffmpeg 命令行参数
    * @param onProgress 进度回调
    */
   runFFmpeg(args: string[], onProgress?: () => FfmpegRunProgress): FfmpegPromise;
-
-  /**
-   * 发送消息到父窗口
-   * **仅在 `createBrowserWindow` 创建的窗口中有效**
-   * @param channel 通道名
-   * @param data 数据
-   */
-  sendToParent(channel: string, ...data: any[]): void;
 }
 
 declare var utools: UToolsApi;
