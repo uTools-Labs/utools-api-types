@@ -158,8 +158,8 @@
               }
             }
           },
-          "mainHide": {
-            "type": "boolean",
+          "mainHide":{
+            "type":"boolean",
             "description": "设置为 `true` 时，启动对应的 `feature` 不会弹出主面板"
           }
         }
