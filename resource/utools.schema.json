@@ -17,23 +17,6 @@
       "type": "string",
       "description": "插件图标，支持png,jpg格式"
     },
-    "platform": {
-      "type": "array",
-      "description": "（已弃用）插件支持的平台，默认为所有平台。",
-      "deprecated": {
-        "deprecatedOn": "20241216",
-        "description": "现在请在开发者工具中直接设置平台"
-      },
-      "items": {
-        "type": "string",
-        "enum": [
-          "win32",
-          "darwin",
-          "linux",
-          "当前字段已被弃用"
-        ]
-      }
-    },
     "development": {
       "type": "object",
       "properties": {
@@ -76,23 +59,6 @@
           },
           "mainPush": {
             "type": "boolean"
-          },
-          "platform": {
-            "type": "array",
-            "description": "（已弃用）此功能的支持平台，默认为所有平台。",
-            "deprecated": {
-              "deprecatedOn": "20241216",
-              "description": "现在请在开发者工具中直接设置平台"
-            },
-            "items": {
-              "type": "string",
-              "enum": [
-                "win32",
-                "darwin",
-                "linux",
-                "当前字段已被弃用"
-              ]
-            }
           },
           "cmds": {
             "type": "array",
@@ -158,8 +124,8 @@
               }
             }
           },
-          "mainHide":{
-            "type":"boolean",
+          "mainHide": {
+            "type": "boolean",
             "description": "设置为 `true` 时，启动对应的 `feature` 不会弹出主面板"
           }
         }
