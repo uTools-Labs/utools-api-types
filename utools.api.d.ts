@@ -1,5 +1,34 @@
 /// <reference path="ubw.d.ts"/>
 /// <reference path="electron.d.ts"/>
+
+interface UTeamPreset<T = unknown> {
+  key: string
+  value: T
+}
+
+interface UTeamFeaturePreset<V> extends UTeamPreset<
+  PluginFeature & {
+    extend?: V
+  }
+> {
+  key: `feature:${string}`
+}
+
+interface UTeamInfo {
+  teamId: string
+  teamLogo: string
+  teamName: string
+  userAvatar: string
+  userId: string
+  userName: string
+}
+
+interface UTeam {
+  allPresets: (match?: string) => Promise<UTeamPreset[]>
+  preset: <T = unknown>(key: string) => T
+  info: () => UTeamInfo
+}
+
 interface UBrowser {
   /**
    * 设置 User-Agent
@@ -250,6 +279,22 @@ type PluginEnterFrom =
   | 'panel'
   | 'hotkey'
   | 'redirect'
+
+interface FfmpegRunProgress {
+  bitrate: string;
+  fps: number;
+  frame: number;
+  percent?: number;
+  q: number | string;
+  size: string;
+  speed: string;
+  time: string;
+}
+
+interface FfmpegPromise extends Promise<void> {
+  kill(): void;
+  quit(): void;
+}
 
 interface UToolsApi {
   /**
@@ -756,7 +801,7 @@ interface UToolsApi {
 
   team: {
     /**
-     * 获取团队信息 
+     * 获取团队信息
      */
     info(): {
       teamId: string,
@@ -777,6 +822,22 @@ interface UToolsApi {
   }
 
   ubrowser: UBrowser;
+
+
+  /**
+   * 运行 ffmpeg
+   * @param args ffmpeg 命令行参数
+   * @param onProgress 进度回调
+   */
+  runFFmpeg(args: string[], onProgress?: () => FfmpegRunProgress): FfmpegPromise;
+
+  /**
+   * 发送消息到父窗口
+   * **仅在 `createBrowserWindow` 创建的窗口中有效**
+   * @param channel 通道名
+   * @param data 数据
+   */
+  sendToParent(channel: string, ...data: any[]): void;
 }
 
 declare var utools: UToolsApi;

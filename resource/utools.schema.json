@@ -17,18 +17,6 @@
       "type": "string",
       "description": "插件图标，支持png,jpg格式"
     },
-    "platform": {
-      "type": "array",
-      "description": "插件支持的平台，默认为所有平台。",
-      "items": {
-        "type": "string",
-        "enum": [
-          "win32",
-          "darwin",
-          "linux"
-        ]
-      }
-    },
     "development": {
       "type": "object",
       "properties": {
@@ -71,18 +59,6 @@
           },
           "mainPush": {
             "type": "boolean"
-          },
-          "platform": {
-            "type": "array",
-            "description": "此功能的支持平台，默认为所有平台。",
-            "items": {
-              "type": "string",
-              "enum": [
-                "win32",
-                "darwin",
-                "linux"
-              ]
-            }
           },
           "cmds": {
             "type": "array",
@@ -148,9 +124,9 @@
               }
             }
           },
-          "mainHide":{
-            "type":"boolean",
-            "description": "设置为 `true` 时，启动对应的 `feature` 不主动弹出主面板"
+          "mainHide": {
+            "type": "boolean",
+            "description": "设置为 `true` 时，启动对应的 `feature` 不会弹出主面板"
           }
         }
       }
