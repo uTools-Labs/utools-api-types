@@ -223,31 +223,41 @@ interface UBrowser {
    * @param options
    */
   run<T extends any = any[]>(options: {
-    show?: boolean,
-    width?: number,
-    height?: number,
-    x?: number,
-    y?: number,
-    center?: boolean,
-    minWidth?: number,
-    minHeight?: number,
-    maxWidth?: number,
-    maxHeight?: number,
-    resizable?: boolean,
-    movable?: boolean,
-    minimizable?: boolean,
-    maximizable?: boolean,
-    alwaysOnTop?: boolean,
-    fullscreen?: boolean,
-    fullscreenable?: boolean,
-    enableLargerThanScreen?: boolean,
-    opacity?: number
+    show?: boolean;
+    width?: number;
+    height?: number;
+    x?: number;
+    y?: number;
+    center?: boolean;
+    minWidth?: number;
+    minHeight?: number;
+    maxWidth?: number;
+    maxHeight?: number;
+    resizable?: boolean;
+    movable?: boolean;
+    minimizable?: boolean;
+    maximizable?: boolean;
+    alwaysOnTop?: boolean;
+    fullscreen?: boolean;
+    fullscreenable?: boolean;
+    enableLargerThanScreen?: boolean;
+    opacity?: number;
+    frame?: boolean;
+    closable?: boolean;
+    focusable?: boolean;
+    skipTaskbar?: boolean;
+    backgroundColor?: string;
+    hasShadow?: boolean;
+    transparent?: boolean;
+    titleBarStyle?: string;
+    thickFrame?: boolean;
   }): Promise<T>;
   /**
    * 运行在闲置的 ubrowser 上
    * @param ubrowserId 1. run(options) 运行结束后, 当 ubrowser 实例窗口仍然显示时返回 2. utools.getIdleUBrowsers() 中获得
    */
   run<T extends any = any[]>(ubrowserId: number): Promise<T>;
+  mardown(): this;
 }
 
 interface Display {
