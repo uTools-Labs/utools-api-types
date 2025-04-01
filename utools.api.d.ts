@@ -1,8 +1,41 @@
 /// <reference path="ubw.d.ts"/>
 /// <reference path="electron.d.ts"/>
 
+interface UtoolsAiModel {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+  cost: number;
+}
+
+interface UtoolsAiMessage {
+  role: "system" | "user" | "assistant";
+  content?: string;
+  reasoning_content?: string;
+}
+
+interface UtoolsAiTool {
+  type: "function";
+  function?: {
+    name: string;
+    description: string;
+    parameters: {
+      type: "object";
+      properties: Record<string, any>;
+    };
+    required?: string[];
+  };
+}
+
+interface UtoolsAiOption {
+  model?: string;
+  messages: UtoolsAiMessage[];
+  tools?: UtoolsAiTool[];
+}
+
 interface CookieFilter {
-  url ?: string;
+  url?: string;
   name?: string;
   domain?: string;
   path?: string;
@@ -54,6 +87,11 @@ interface UBrowser {
    * @param savePath 截图保存路径，可以是文件夹 或 .png文件完全路径, 默认保存临时目录
    */
   screenshot(arg: string | { x: number, y: number, width: number, height: number }, savePath?: string): this;
+  /**
+   * 网页转成 markdown
+   * @param selector css 选择器或者XPATH
+   */
+  markdown(selector?: string): this;
   /**
    * 保存为PDF
    * @param options 选项
@@ -190,25 +228,34 @@ interface UBrowser {
    * @param options
    */
   run<T extends any = any[]>(options: {
-    show?: boolean,
-    width?: number,
-    height?: number,
-    x?: number,
-    y?: number,
-    center?: boolean,
-    minWidth?: number,
-    minHeight?: number,
-    maxWidth?: number,
-    maxHeight?: number,
-    resizable?: boolean,
-    movable?: boolean,
-    minimizable?: boolean,
-    maximizable?: boolean,
-    alwaysOnTop?: boolean,
-    fullscreen?: boolean,
-    fullscreenable?: boolean,
-    enableLargerThanScreen?: boolean,
-    opacity?: number
+    show?: boolean;
+    width?: number;
+    height?: number;
+    x?: number;
+    y?: number;
+    center?: boolean;
+    minWidth?: number;
+    minHeight?: number;
+    maxWidth?: number;
+    maxHeight?: number;
+    resizable?: boolean;
+    movable?: boolean;
+    minimizable?: boolean;
+    maximizable?: boolean;
+    alwaysOnTop?: boolean;
+    fullscreen?: boolean;
+    fullscreenable?: boolean;
+    enableLargerThanScreen?: boolean;
+    opacity?: number;
+    frame?: boolean;
+    closable?: boolean;
+    focusable?: boolean;
+    skipTaskbar?: boolean;
+    backgroundColor?: string;
+    hasShadow?: boolean;
+    transparent?: boolean;
+    titleBarStyle?: string;
+    thickFrame?: boolean;
   }): Promise<T>;
   /**
    * 运行在闲置的 ubrowser 上
@@ -283,6 +330,14 @@ interface FfmpegPromise extends Promise<void> {
   quit(): void;
 }
 
+interface MainPushResult {
+  icon?: string,
+  text: string,
+  title?: string
+}
+
+type MainPushResultList = MainPushResult[] | Promise<MainPushResult[]>
+
 interface UToolsApi {
   /**
    * 插件应用进入时触发
@@ -291,7 +346,7 @@ interface UToolsApi {
   /**
   * 向搜索面板推送消息
   */
-  onMainPush<T = any>(callback: (action: { code: string, type: string, payload: T }) => { icon?: string, text: string, title?: string }[], selectCallback: (action: { code: string, type: string, payload: any, option: { icon?: string, text: string, title?: string } }) => void): void;
+  onMainPush<T = any>(callback: (action: { code: string, type: string, payload: T }) => MainPushResultList, selectCallback: (action: { code: string, type: string, payload: any, option: MainPushResult }) => void): void;
   /**
    * 插件应用隐藏后台或完全退出时触发
    */
@@ -822,7 +877,30 @@ interface UToolsApi {
    * @param args ffmpeg 命令行参数
    * @param onProgress 进度回调
    */
-  runFFmpeg(args: string[], onProgress?: () => FfmpegRunProgress): FfmpegPromise;
+  runFFmpeg(args: string[], onProgress?: (progress: FfmpegRunProgress) => void): FfmpegPromise;
+
+  /**
+   * AI 能力，流式调用
+   * @param option 调用参数
+   * @param option.model 模型
+   * @param option.messages 消息
+   * @param option.tools 工具，目前仅支持 function
+   * @param streamCallback 流式回调
+   */
+  ai(
+    option: UtoolsAiOption,
+    streamCallback: (chunk: UtoolsAiMessage) => void
+  ): Promise<void>
+  /**
+   * AI 能力，非流式调用
+   * @param option 调用参数
+   */
+  ai(option: UtoolsAiOption): Promise<UtoolsAiMessage>
+
+  /**
+   * 获取模型列表
+   */
+  allAiModels(): Promise<UtoolsAiModel[]>;
 }
 
 declare var utools: UToolsApi;
