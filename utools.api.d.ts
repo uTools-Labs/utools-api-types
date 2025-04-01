@@ -88,6 +88,11 @@ interface UBrowser {
    */
   screenshot(arg: string | { x: number, y: number, width: number, height: number }, savePath?: string): this;
   /**
+   * 网页转成 markdown
+   * @param selector css 选择器或者XPATH
+   */
+  mardown(selector?: string): this;
+  /**
    * 保存为PDF
    * @param options 选项
    * @param savePath PDF保存路径，可以是文件夹 或 .pdf文件完全路径, 默认保存临时目录
@@ -257,7 +262,6 @@ interface UBrowser {
    * @param ubrowserId 1. run(options) 运行结束后, 当 ubrowser 实例窗口仍然显示时返回 2. utools.getIdleUBrowsers() 中获得
    */
   run<T extends any = any[]>(ubrowserId: number): Promise<T>;
-  mardown(): this;
 }
 
 interface Display {
@@ -873,7 +877,7 @@ interface UToolsApi {
    * @param args ffmpeg 命令行参数
    * @param onProgress 进度回调
    */
-  runFFmpeg(args: string[], onProgress?: () => FfmpegRunProgress): FfmpegPromise;
+  runFFmpeg(args: string[], onProgress?: (progress: FfmpegRunProgress) => void): FfmpegPromise;
 
   /**
    * AI 能力，流式调用
