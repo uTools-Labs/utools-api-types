@@ -91,7 +91,7 @@ interface UBrowser {
    * 网页转成 markdown
    * @param selector css 选择器或者XPATH
    */
-  mardown(selector?: string): this;
+  markdown(selector?: string): this;
   /**
    * 保存为PDF
    * @param options 选项
