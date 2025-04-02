@@ -8,8 +8,7 @@ interface UtoolsAiModel {
   icon: string;
   cost: number;
 }
-
-export interface UtoolsAiResult<T> extends Promise<T> {
+interface UtoolsAiResult<T> extends Promise<T> {
   abort(): void;
 }
 
