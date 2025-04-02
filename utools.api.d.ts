@@ -8,6 +8,9 @@ interface UtoolsAiModel {
   icon: string;
   cost: number;
 }
+interface UtoolsAiResult<T> extends Promise<T> {
+  abort(): void;
+}
 
 interface UtoolsAiMessage {
   role: "system" | "user" | "assistant";
@@ -890,12 +893,12 @@ interface UToolsApi {
   ai(
     option: UtoolsAiOption,
     streamCallback: (chunk: UtoolsAiMessage) => void
-  ): Promise<void>
+  ): UtoolsAiResult<void>
   /**
    * 非流式调用 AI
    * @param option 选项参数
    */
-  ai(option: UtoolsAiOption): Promise<UtoolsAiMessage>
+  ai(option: UtoolsAiOption): UtoolsAiResult<UtoolsAiMessage>
 
   /**
    * 获取所有 AI 模型
