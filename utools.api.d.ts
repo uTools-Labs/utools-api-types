@@ -9,7 +9,7 @@ interface UtoolsAiModel {
   cost: number;
 }
 
-export interface UtoolAiResult<T> extends Promise<T> {
+export interface UtoolsAiResult<T> extends Promise<T> {
   abort(): void;
 }
 
@@ -894,12 +894,12 @@ interface UToolsApi {
   ai(
     option: UtoolsAiOption,
     streamCallback: (chunk: UtoolsAiMessage) => void
-  ): UtoolAiResult<void>
+  ): UtoolsAiResult<void>
   /**
    * AI 能力，非流式调用
    * @param option 调用参数
    */
-  ai(option: UtoolsAiOption): UtoolAiResult<UtoolsAiMessage>
+  ai(option: UtoolsAiOption): UtoolsAiResult<UtoolsAiMessage>
 
   /**
    * 获取模型列表
