@@ -92,7 +92,7 @@ interface UBrowser {
    */
   screenshot(arg: string | { x: number, y: number, width: number, height: number }, savePath?: string): this;
   /**
-   * 网页转成 markdown
+   * 转为 markdown 文本
    * @param selector css 选择器或者XPATH
    */
   markdown(selector?: string): this;
@@ -884,11 +884,11 @@ interface UToolsApi {
   runFFmpeg(args: string[], onProgress?: (progress: FfmpegRunProgress) => void): FfmpegPromise;
 
   /**
-   * AI 能力，流式调用
-   * @param option 调用参数
+   * 流式调用 AI
+   * @param option 选项参数
    * @param option.model 模型
    * @param option.messages 消息
-   * @param option.tools 工具，目前仅支持 function
+   * @param option.tools 工具集合，使用 function calling 配置
    * @param streamCallback 流式回调
    */
   ai(
@@ -896,13 +896,13 @@ interface UToolsApi {
     streamCallback: (chunk: UtoolsAiMessage) => void
   ): UtoolsAiResult<void>
   /**
-   * AI 能力，非流式调用
-   * @param option 调用参数
+   * 非流式调用 AI
+   * @param option 选项参数
    */
   ai(option: UtoolsAiOption): UtoolsAiResult<UtoolsAiMessage>
 
   /**
-   * 获取模型列表
+   * 获取所有 AI 模型
    */
   allAiModels(): Promise<UtoolsAiModel[]>;
 }
