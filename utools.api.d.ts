@@ -495,9 +495,13 @@ interface UToolsApi {
    */
   redirect(label: string | string[], payload: string | { type: 'text' | 'img' | 'files', data: any }): boolean;
   /**
-   * 插件内设置快捷方式(快捷键)
-   * @param cmdLabel 功能指令
-   * @param autocopy 自动复制内容到剪贴板
+   * 在插件内快速注册快捷方式（快捷键）并跳转到快捷方式设置界面
+   * @param cmdLabel 指令名称
+   * @param autocopy 是否自动复制选中的内容（默认为 `false`）
+   * @example
+   * ```js
+   * utools.redirectHotKeySetting("测试指令")
+   * ```
    */
   redirectHotKeySetting(cmdLabel: string, autocopy?: boolean): void
   /**
