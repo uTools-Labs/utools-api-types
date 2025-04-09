@@ -491,9 +491,14 @@ interface UToolsApi {
   getFeatures(codes?: string[]): PluginFeature[];
   /**
    * 插件应用间跳转
-   * @todo 创建针对type的多个重载
    */
   redirect(label: string | string[], payload: string | { type: 'text' | 'img' | 'files', data: any }): boolean;
+  /**
+   * 跳转(前往) uTools 设置界面，引导用户配置指令全局快捷键
+   * @param cmdLabel 指令名称
+   * @param autocopy 是否自动复制，默认为 false
+   */
+  redirectHotKeySetting(cmdLabel: string, autocopy?: boolean): void;
   /**
    * 获取闲置的 ubrowser
    */
@@ -883,6 +888,11 @@ interface UToolsApi {
   runFFmpeg(args: string[], onProgress?: (progress: FfmpegRunProgress) => void): FfmpegPromise;
 
   /**
+   * 获取所有 AI 模型
+   */
+  allAiModels(): Promise<UtoolsAiModel[]>;
+
+  /**
    * 流式调用 AI
    * @param option 选项参数
    * @param option.model 模型
@@ -899,11 +909,6 @@ interface UToolsApi {
    * @param option 选项参数
    */
   ai(option: UtoolsAiOption): UtoolsAiResult<UtoolsAiMessage>
-
-  /**
-   * 获取所有 AI 模型
-   */
-  allAiModels(): Promise<UtoolsAiModel[]>;
 }
 
 declare var utools: UToolsApi;
