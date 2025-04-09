@@ -495,6 +495,12 @@ interface UToolsApi {
    */
   redirect(label: string | string[], payload: string | { type: 'text' | 'img' | 'files', data: any }): boolean;
   /**
+   * 插件内设置快捷方式(快捷键)
+   * @param cmdLabel 功能指令
+   * @param autocopy 自动复制内容到剪贴板
+   */
+  redirectHotKeySetting(cmdLabel: string, autocopy?: boolean): void
+  /**
    * 获取闲置的 ubrowser
    */
   getIdleUBrowsers(): { id: number, title: string, url: string }[];
