@@ -500,6 +500,10 @@ interface UToolsApi {
    */
   redirectHotKeySetting(cmdLabel: string, autocopy?: boolean): void;
   /**
+   * 跳转(前往) uTools 自定义 AI 模型设置界面，引导用户配置自定义 AI 模型
+   */
+  redirectAiModelsSetting(): void;
+  /**
    * 获取闲置的 ubrowser
    */
   getIdleUBrowsers(): { id: number, title: string, url: string }[];

@@ -60,6 +60,10 @@
           "mainPush": {
             "type": "boolean"
           },
+          "mainHide": {
+            "type": "boolean",
+            "description": "设置为 `true` 时，打开对应的 `feature` 不主动弹出搜索框窗口"
+          },
           "cmds": {
             "type": "array",
             "description": "该功能下可响应的命令集，支持 6 种类型，由 cmds 的类型或 cmds.type 决定。",
@@ -120,13 +124,16 @@
                     "file",
                     "directory"
                   ]
+                },
+                "extensions": {
+                  "type": "array",
+                  "description": "文件扩展名",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
             }
-          },
-          "mainHide": {
-            "type": "boolean",
-            "description": "设置为 `true` 时，打开对应的 `feature` 不主动弹出搜索框面板"
           }
         }
       }
