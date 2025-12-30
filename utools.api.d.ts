@@ -1,6 +1,8 @@
 /// <reference path="ubw.d.ts"/>
 /// <reference path="electron.d.ts"/>
 
+import type { Sharp, SharpOptions } from 'sharp';
+
 interface UtoolsAiModel {
   id: string;
   label: string;
@@ -92,7 +94,7 @@ interface UBrowser {
   screenshot(arg: string | { x: number, y: number, width: number, height: number }, savePath?: string): this;
   /**
    * 转为 markdown 文本
-   * @param selector css 选择器或者XPATH
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
    */
   markdown(selector?: string): this;
   /**
@@ -106,30 +108,34 @@ interface UBrowser {
    */
   device(arg: { size: { width: number, height: number }, useragent: string }): this;
   /**
-   * 在当前 url 根据名称获取 cookie
-   * @param name 为空获取当前 url 全部 cookie
+   * 获取当前 URL 的 Cookie。
+   * @param name 可选，指定 Cookie 名称。如果未传入，则返回当前 URL 的所有 Cookie。
    */
   cookies(name?: string): this;
   /**
-   * 根据条件获取 ubrowser cookies
-   * @param filter 条件过滤对象
+   * 根据条件获取 Cookie。
+   * @param filter 条件过滤对象，例如 { name: string, domain?: string }。
    */
   cookies(filter: CookieFilter): this;
   /**
-   * 设置Cookie
+   * 设置单个 Cookie。
+   * @param name Cookie 名称
+   * @param value Cookie 值
    */
   setCookies(name: string, value: string): this;
   /**
-   * 设置Cookie
+   * 批量设置 Cookie。
+   * @param cookies Cookie 数组，每个元素包含 name 和 value。
    */
-  setCookies(cookies: { name: string, value: string }[]): this;
+  setCookies(cookies: { name: string; value: string }[]): this;
   /**
-   * 删除 cookie
+   * 删除指定 Cookie。
+   * @param name Cookie 名称
    */
   removeCookies(name: string): this;
   /**
-   * 清空cookie
-   * @param url 在执行"goto"前执行 url参数必需
+   * 清空 Cookie。
+   * @param url 可选，指定 URL。若在执行 "goto" 前调用，url 参数必填。
    */
   clearCookies(url?: string): this;
   /**
@@ -143,30 +149,66 @@ interface UBrowser {
    */
   evaluate<T extends any[]>(func: (...params: T) => any, ...params: T): this;
   /**
-   * 等待时间
-   * @param ms 毫秒
+   * 等待指定的时间。
+   * @param ms 等待时长（毫秒）
    */
   wait(ms: number): this;
   /**
-   * 等待元素出现
-   * @param selector DOM元素
-   * @param timeout 超时 默认60000 ms(60秒)
+   * 等待元素满足条件。
+   *
+   * 默认行为：等待元素出现。
+   *
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param options 等待选项
+   *  - result: true 等待出现，false 等待消失（默认 true）
+   *  - timeout: 超时时间，默认 60000 ms
+   *  - interval: 轮询间隔（毫秒），默认 500 ms
+  */
+  wait(selector: string, options?: { result?: boolean; timeout?: number; interval?: number; }): this;
+  /**
+   * 等待元素满足条件（简写形式）。
+   *
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param result 为 true 等待出现，为 false 等待消失（默认 true）
+   */
+  wait(selector: string, result?: boolean): this;
+  /**
+   * 等待元素出现，指定超时时间（简写形式）。
+   *
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param timeout 超时时间（毫秒）
    */
   wait(selector: string, timeout?: number): this;
   /**
-   * 等待 JS函数 执行返回 true
-   * @param func 执行的JS函数
-   * @param timeout 超时 默认60000 ms(60秒)
-   * @param params 传到 func 中的参数
+   * 等待 JS 函数执行结果为 true。
+   *
+   * 该函数将被周期性执行，直到返回 true 或超时。
+   *
+   * @param func 判定函数，返回 true 表示条件满足
+   * @param timeout 超时时间，默认 60000 ms
+   * @param params 传递给 func 的参数
    */
   wait<T extends any[]>(func: (...params: T) => boolean, timeout?: number, ...params: T): this;
-  /**
-   * 当元素存在时执行，直到碰到 end
-   * @param selector DOM元素
+    /**
+   * 等待 JS 函数执行结果为 true。
+   *
+   * 该函数将被周期性执行，直到返回 true 或超时。
+   *
+   * @param func 判定函数，返回 true 表示条件满足
+   * @param options 等待选项
+   *  - timeout: 超时时间，默认 60000 ms
+   *  - interval: 轮询间隔（毫秒），默认 500 ms
+   * @param params 传递给 func 的参数
    */
-  when(selector: string): this;
+  wait<T extends any[]>(func: (...params: T) => boolean, options?: { timeout?: number; interval?: number; }, ...params: T): this;
   /**
-   * 当 JS函数执行返回 true 时执行直到碰到 end
+   * 当元素满足条件时，直到碰到 end
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param result 可选，为 true 表示当元素存在时，为 false 表示当元素不存在时（默认 true）
+   */
+  when(selector: string, result?: boolean): this;
+  /**
+   * 当 JS 函数执行返回 true 时，直到碰到 end
    * @param func 执行的JS函数
    * @param params 传到 func 中的参数
    */
@@ -176,39 +218,136 @@ interface UBrowser {
    */
   end(): this;
   /**
-   * 单击元素
+   * 单击指定元素
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param button 可选，鼠标按键；当设置该参数时，将以物理方式执行操作
    */
-  click(selector: string): this;
+  click(selector: string, button?: 'left' | 'middle' | 'right'): this;
   /**
-   * 元素触发按下鼠标左键
+   * 单击坐标位置
+   * @param x 窗口 X 坐标
+   * @param y 窗口 Y 坐标
+   * @param button 可选，鼠标按键，默认为 'left'
    */
-  mousedown(selector: string): this;
+  click(x: number, y: number, button?: 'left' | 'middle' | 'right'): this;
   /**
-   * 元素触发释放鼠标左键
+   * 双击指定元素
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param button 可选，鼠标按键；当设置该参数时，将以物理方式执行操作
    */
-  mouseup(selector: string): this;
+  dblclick(selector: string, button?: 'left' | 'middle' | 'right'): this;
   /**
-   * 赋值 file input
-   * @param selector <input type='file' /> 元素
-   * @param payload 1. string - 文件路径 或 图片的base64编码，2. string[] - 文件路径集合，3. Uint8Array[]
+   * 双击坐标位置
+   * @param x 窗口 X 坐标
+   * @param y 窗口 Y 坐标
+   * @param button 可选，鼠标按键，默认为 'left'
+   */
+  dblclick(x: number, y: number, button?: 'left' | 'middle' | 'right'): this;
+  /**
+   * 在指定元素按下鼠标键（mousedown）
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param button 可选，鼠标按键；当设置该参数时，将以物理方式执行操作
+   */
+  mousedown(selector: string, button?: 'left' | 'middle' | 'right'): this;
+  /**
+   * 在坐标位置按下鼠标键
+   * @param x 窗口 X 坐标
+   * @param y 窗口 Y 坐标
+   * @param button 可选，鼠标按键，默认为 'left'
+   */
+  mousedown(x: number, y: number, button?: 'left' | 'middle' | 'right'): this;
+  /**
+   * 在指定元素释放鼠标键（mouseup）
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param button 可选，鼠标按键；当设置该参数时，将以物理方式执行操作
+   */
+  mouseup(selector: string, button?: 'left' | 'middle' | 'right'): this;
+  /**
+   * 在坐标位置释放鼠标键
+   * @param x 窗口 X 坐标
+   * @param y 窗口 Y 坐标
+   * @param button 可选，鼠标按键，默认为 'left'
+   */
+  mouseup(x: number, y: number, button?: 'left' | 'middle' | 'right'): this;
+  /**
+   * 移动鼠标到元素
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   */
+  hover(selector: string): this;
+  /**
+   * 移动鼠标到坐标。
+   * @param x 窗口 X 坐标
+   * @param y 窗口 Y 坐标
+   */
+  hover(x: number, y: number): this;
+  /**
+   * 上传文件（必须为 input[type=file]）
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param payload 文件内容，可为以下类型：
+   *  - string：文件路径或图像的 base64 Data URL
+   *  - string[]：多个文件路径
+   *  - Uint8Array[]：文件 Buffer
    */
   file(selector: string, payload: string | string[] | Uint8Array): this;
   /**
-   * input textarea select 等元素赋值并触发 input 或 change事件
+   * 拖放文件到指定元素
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param payload 文件内容，可为以下类型：
+   *  - string：文件路径或图像的 base64 Data URL
+   *  - string[]：多个文件路径
+   *  - Uint8Array[]：文件 Buffer
+   */
+  drop(selector: string, payload: string | string[] | Uint8Array): this;
+  /**
+   * 拖放文件到指定坐标
+   * @param x 窗口 X 坐标
+   * @param y 窗口 Y 坐标
+   * @param payload 文件内容，可为以下类型：
+   *  - string：文件路径或图像的 base64 Data URL
+   *  - string[]：多个文件路径
+   *  - Uint8Array[]：多个文件的二进制数据
+   */
+  drop(x: number, y: number, payload: string | string[] | Uint8Array): this;
+  /**
+   * 输入文本，模拟输入法输入，不触发键盘按键事件
+   * @param text 字符串文本
+   */
+  input(text: string): this;
+  /**
+   * 元素获得焦点后，输入文本，模拟输入法输入，不触发键盘按键事件
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param text 字符串文本
+   */
+  input(selector: string, text: string): this;
+  /**
+   * input、textarea、select 等元素赋值
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param value 元素的值
    */
   value(selector: string, value: string): this;
   /**
    * checkbox radio 元素选中或取消选中
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
    */
   check(selector: string, checked: boolean): this;
   /**
    * 元素获得焦点
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
    */
   focus(selector: string): this;
   /**
-   * 滚动到元素位置
+   * 滚动到指定元素位置
+   *
+   * @param selector CSS 或 XPath 选择器，支持使用 `>>` 进行 iframe 嵌套
+   * @param options 可选参数：
+   *  - boolean：是否执行滚动（默认 true）
+   *  - object：滚动行为与条件配置
    */
-  scroll(selector: string): this;
+  scroll(selector: string, optional?: boolean | {
+    behavior?: 'auto' | 'smooth';
+    block?: 'start' | 'center' | 'end' | 'nearest';
+    inline?: 'start' | 'center' | 'end' | 'nearest';
+  }): this;
   /**
    * Y轴滚动
    */
@@ -219,52 +358,115 @@ interface UBrowser {
   scroll(x: number, y: number): this;
   /**
    * 下载文件
+   *
+   * @param url 需要下载的文件地址。
+   * @param savePath 可选，文件保存路径或保存目录，未传时将保存到下载目录
    */
   download(url: string, savePath?: string): this;
   /**
-   * 下载文件
+   * 下载文件（动态生成的下载地址）
+   *
+   * @param func 返回下载地址的函数。该函数将在 ubrowser 运行环境中执行。
+   * @param savePath 可选，文件保存路径或保存目录，未传时将保存到下载目录
+   * @param params 传递给 func 的参数列表
    */
   download(func: (...params: any[]) => string, savePath: string | null, ...params: any[]): this;
   /**
-   * 启动一个 ubrowser 运行
-   * 当运行结束后，窗口如果为隐藏状态将自动销毁窗口
-   * @param options
+   * 启动一个新的 ubrowser 实例运行。
+   *
+   * 当执行结束后：
+   * - 若窗口为隐藏状态（show = false），将自动销毁该窗口
+   * - 若窗口仍处于显示状态，则保留实例并返回其 ID
+   *
+   * @param options 窗口及运行配置项
    */
   run<T extends any = any[]>(options: {
+    /** 是否显示窗口，默认 false */
     show?: boolean;
+
+    /** 窗口宽度 */
     width?: number;
+    /** 窗口高度 */
     height?: number;
+
+    /** 窗口 X 坐标 */
     x?: number;
+    /** 窗口 Y 坐标 */
     y?: number;
+
+    /** 是否居中显示 */
     center?: boolean;
+
+    /** 最小宽度 */
     minWidth?: number;
+    /** 最小高度 */
     minHeight?: number;
+
+    /** 最大宽度 */
     maxWidth?: number;
+    /** 最大高度 */
     maxHeight?: number;
+
+    /** 是否允许调整大小 */
     resizable?: boolean;
+    /** 是否允许移动 */
     movable?: boolean;
+
+    /** 是否允许最小化 */
     minimizable?: boolean;
+    /** 是否允许最大化 */
     maximizable?: boolean;
+
+    /** 是否置顶 */
     alwaysOnTop?: boolean;
+
+    /** 是否全屏 */
     fullscreen?: boolean;
+    /** 是否允许进入全屏 */
     fullscreenable?: boolean;
+
+    /** 是否允许窗口尺寸大于屏幕 */
     enableLargerThanScreen?: boolean;
+
+    /** 窗口透明度（0 ~ 1） */
     opacity?: number;
+
+    /** 是否显示窗口边框 */
     frame?: boolean;
+
+    /** 是否允许关闭 */
     closable?: boolean;
+    /** 是否可获取焦点 */
     focusable?: boolean;
+
+    /** 是否在任务栏显示 */
     skipTaskbar?: boolean;
+
+    /** 窗口背景色 */
     backgroundColor?: string;
+
+    /** 是否显示阴影 */
     hasShadow?: boolean;
+
+    /** 是否透明窗口 */
     transparent?: boolean;
+
+    /** 标题栏样式（平台相关） */
     titleBarStyle?: string;
+
+    /** 是否使用系统厚边框（Windows） */
     thickFrame?: boolean;
   }): Promise<T>;
+
   /**
-   * 运行在闲置的 ubrowser 上
-   * @param ubrowserId 1. run(options) 运行结束后, 当 ubrowser 实例窗口仍然显示时返回 2. utools.getIdleUBrowsers() 中获得
+   * 在一个闲置的 ubrowser 实例上运行。
+   *
+   * @param ubrowserId ubrowser 实例 ID：
+   * - 可由 `run(options)` 在窗口未销毁时返回
+   * - 或通过 `utools.getIdleUBrowsers()` 获取
    */
   run<T extends any = any[]>(ubrowserId: number): Promise<T>;
+
 }
 
 interface Display {
@@ -860,29 +1062,9 @@ interface UToolsApi {
     removeItem(key: string): void;
   };
 
-  team: {
-    /**
-     * 获取团队信息
-     */
-    info(): {
-      teamId: string,
-      teamName: string,
-      teamLogo: string,
-      userId: string,
-      userName: string,
-      userAvatar: string
-    };
-    /**
-     * 获取团队版预设键名对应的值
-     */
-    preset<T = any>(key: string): T;
-    /**
-     * 获取团队版预设的所有数据
-     */
-    allPresets(): Promise<{ key: string, value: any }[]>;
-  }
-
   ubrowser: UBrowser;
+
+  sharp: (input?: Buffer | Uint8Array | Uint8ClampedArray | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array | Float32Array | Float64Array | string, options?: SharpOptions) => Sharp;
 
   /**
    * 运行 ffmpeg

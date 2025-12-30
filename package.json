@@ -20,5 +20,8 @@
     "default": {
       "types": "./utools.api.d.ts"
     }
+  },
+  "dependencies": {
+    "@types/sharp": "^0.31.1"
   }
 }
