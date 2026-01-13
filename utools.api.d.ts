@@ -1,7 +1,8 @@
 /// <reference path="ubw.d.ts"/>
 /// <reference path="electron.d.ts"/>
 
-import type { Sharp, SharpOptions } from 'sharp';
+type Sharp = import('sharp').Sharp;
+type SharpOptions = import('sharp').SharpOptions;
 
 interface UtoolsAiModel {
   id: string;
