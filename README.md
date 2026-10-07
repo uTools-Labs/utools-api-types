@@ -1,102 +1,112 @@
-# uTools 官方类型辅助文件
+# 类型定义
 
-## 提供代码提示文件
+uTools 提供官方的 API 类型定义，可在插件应用开发过程中获得代码提示和类型检查支持。
 
-- [utools.api.d.ts](./utools.api.d.ts) `window.utools` 对象类型提示
-- [electron.d.ts](./electron.d.ts) preload 内 `electron` 模块导入提示
-- [resource/utools.schema](./resource/utools.schema.json) 配置文件 JSON Schema
+## uTools API 类型定义
 
-## `window.utools` 对象类型提示
+[`utools-api-types`](https://github.com/uTools-Labs/utools-api-types) 是 uTools 官方维护的 TypeScript 类型定义库，提供当前 `utools` API 的完整类型定义，并会随着 uTools API 的版本迭代持续更新。
 
-目前将 utools 挂载到全局 window 下，提供在渲染层跟 preload 层的群体代码提示
+无论使用 JavaScript 还是 TypeScript 开发插件应用，都可以借助它获得 `utools` API 的代码提示和类型检查。
 
-第一步
+> `utools-api-types` 基于全局变量 `utools` 进行类型声明，安装并配置后无需手动引入，编辑器即可自动识别。
 
-```bash
+## 安装
+
+在项目中安装 `utools-api-types`：
+
+::: code-group
+
+```shell [npm]
 npm install utools-api-types --save-dev
 ```
 
-第二步 配置 tsconfig.json
+```shell [pnpm]
+pnpm add -D utools-api-types
+```
 
-```json
+```shell [yarn]
+yarn add -D utools-api-types
+```
+
+:::
+
+## JavaScript 项目
+
+### 配置 jsconfig.json
+
+在项目根目录创建 `jsconfig.json`，并在 `compilerOptions.types` 中引入 `utools-api-types`：
+
+```json5
 {
   "compilerOptions": {
     "types": ["utools-api-types"]
   },
-  "includes": [
-    // 如果使用ts或者框架，请添加需要类型提示的文件范围
-    // 案例：
-    // src/**/*.ts
-    // preload.js
+  "include": [
+    // 需要类型提示和类型检查的文件范围，请根据项目实际目录结构调整
+    "src/**/*.js",
+    "bridge/**/*.js"
   ]
 }
 ```
 
-### API 代码示例
+## TypeScript 项目
 
-```javascript
-// 默认浏览器打开网页
-window.utools.shellOpenExternal("https://u.tools");
+### 配置 tsconfig.json
 
-// 在资源管理器中显示文件
-window.utools.shellShowItemInFolder("d:\\test");
+在 `tsconfig.json` 的 `compilerOptions.types` 中添加 `utools-api-types`：
 
-// ubrowser 网页自动化
-window.utools.ubrowser
-  .goto("https://cn.bing.com")
-  .value("#sb_form_q", "uTools")
-  .click("#sb_form_go")
-  .run({ width: 1000, height: 600 });
-
-// 值键对方式存储数据
-window.utools.dbStorage.setItem("key", "value");
-
-// 执行截图
-window.utools.screenCapture((imagebase64) => {
-  // 截图完的回调
-});
-
-// 执行取色
-window.utools.screenColorPick(({ hex, rgb }) => {
-  // 取色完的回调
-});
-```
-
-## `electron` 模块代码提示
-
-引入此类型文件后，支持在 cjs 模式下也提供定制化的 `electron` 模块 api 提示
-
-> 在 uTools 中，可以通过 cjs 的形式直接使用部分 `electron` 的 api ，但是此部分支持是直接通过 uTools 内置的 nodejs 实现，因此请勿下载额外的 `electron` 依赖。
-
-### API 代码示例
-
-```javascript
-// preload.js
-
-const { ipcRenderer } = require("electron");
-
-window.onMyChannel = (callback) => {
-  ipcRenderer.on("myChannel", (e, data) => {
-    callback?.({
-      ...data,
-      senderId: e.senderId,
-    });
-  });
-};
-
-window.ipc = ipcRenderer;
-```
-
-## 配置文件 JSON Schema
-
-通过 JSON Schema 实现了在 `plugin.json` 内的代码提示
-
-引入 JSON Schema 需要在 `plugin.json` 的第一行添加 `$schema` 字段：
-
-```json
+```json5
 {
-  "$schema": "./node_modules/utools-api-types/resource/utools.schema.json"
+  "compilerOptions": {
+    "types": ["utools-api-types"]
+  },
+  "include": [
+    // 需要类型提示和类型检查的文件范围，请根据项目实际目录结构调整
+    "src/**/*.ts",
+    "bridge/**/*.js"
+  ]
 }
 ```
 
-> 添加 `$schema` 时，需要注意跟 `plugin.json` 所在的文件位置有关系，必须是相对于 `plugin.json` 的位置
+字段说明：
+
+| 字段 | 说明 |
+| --- | --- |
+| `compilerOptions.types` | 指定参与类型检查的全局类型定义包，需包含 `utools-api-types` |
+| `include` | 指定需要提供代码提示和类型检查的文件范围，请根据项目实际目录结构调整 |
+
+> 如果项目已经通过其他方式配置了 `types`，请将 `utools-api-types` 追加到现有配置中，避免覆盖原有类型定义。
+
+## 验证代码提示
+
+配置完成后，在 `include` 范围内的文件中输入 `window.utools.`，编辑器即可提示可用的 API：
+
+```js
+window.utools.
+```
+
+编辑器还会根据 API 类型定义提供参数提示、返回值提示和类型检查。例如：
+
+```js
+window.utools.showNotification('hello world')
+```
+
+## 常见问题
+
+### 编辑器没有代码提示
+
+- 确认已安装 `utools-api-types`，并在 `jsconfig.json` 或 `tsconfig.json` 中完成配置。
+- 确认当前编辑的文件处于 `include` 指定的文件范围内。
+- 若修改配置后仍无提示，请重启编辑器，或重新加载 TypeScript/JavaScript 语言服务。
+
+### 与已有 types 配置冲突
+
+如果项目已通过其他方式配置了 `compilerOptions.types`，请将 `utools-api-types` 追加到现有数组中，避免覆盖原有类型定义。
+
+### 类型定义与实际版本不一致
+
+`utools-api-types` 会随 uTools API 版本迭代更新，如发现类型缺失或过期，请升级到最新版本：
+
+```shell
+npm install utools-api-types@latest --save-dev
+```
